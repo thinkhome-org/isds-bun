@@ -1,0 +1,5 @@
+{
+  "name": "@thinkhome-org/isds-mock-server",
+  "private": true,
+  "type": "module"
+}

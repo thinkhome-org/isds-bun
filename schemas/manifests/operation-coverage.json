@@ -1,0 +1,10 @@
+{
+  "generatedAt": null,
+  "source": "not-ingested",
+  "operationsDiscovered": 0,
+  "rawMethodsGenerated": 0,
+  "highLevelWrappersComplete": 0,
+  "contractFixtures": 0,
+  "coveragePercent": 0,
+  "operations": []
+}

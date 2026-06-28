@@ -1,0 +1,34 @@
+{
+  "name": "isds-bun-workspace",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "catalog": {
+    "@types/bun": "latest",
+    "typescript": "latest",
+    "@opentui/core": "latest"
+  },
+  "scripts": {
+    "check": "bun run typecheck && bun test && bun run generate:check",
+    "typecheck": "bunx tsc --noEmit",
+    "test": "bun test",
+    "test:coverage": "bun test --coverage",
+    "test:contract": "bun test tests/contract",
+    "test:crypto": "bun test tests/crypto",
+    "test:live": "bun test tests/live",
+    "schemas:fetch": "bun scripts/fetch-schemas.ts",
+    "schemas:diff": "bun scripts/schema-diff.ts",
+    "generate": "bun scripts/generate.ts",
+    "generate:check": "bun scripts/verify-generated.ts",
+    "build": "bun scripts/build.ts",
+    "build:executables": "bun scripts/build-executables.ts",
+    "pack": "bun pm pack",
+    "release:check": "bun scripts/release.ts --check"
+  },
+  "devDependencies": {
+    "@types/bun": "catalog:",
+    "typescript": "catalog:"
+  }
+}
