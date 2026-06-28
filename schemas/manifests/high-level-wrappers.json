@@ -11,6 +11,24 @@
       "method": "listSent",
       "fixture": true,
       "test": true
+    },
+    "MessageEnvelopeDownload": {
+      "module": "messages",
+      "method": "downloadEnvelope",
+      "fixture": true,
+      "test": true
+    },
+    "GetDeliveryInfo": {
+      "module": "messages",
+      "method": "getDeliveryInfo",
+      "fixture": true,
+      "test": true
+    },
+    "GetSignedDeliveryInfo": {
+      "module": "messages",
+      "method": "getSignedDeliveryInfo",
+      "fixture": true,
+      "test": true
     }
   }
 }

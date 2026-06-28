@@ -58,6 +58,40 @@ export interface ListSentMessagesResult {
   readonly rawXml: string;
 }
 
+export interface MessageEnvelopeDownloadResult {
+  readonly statusCode: string;
+  readonly statusMessage: string;
+  readonly envelope?: ReceivedMessageRecord;
+  readonly rawXml: string;
+}
+
+export interface DeliveryEvent {
+  readonly time?: string;
+  readonly description?: string;
+}
+
+export interface DeliveryInfoResult {
+  readonly statusCode: string;
+  readonly statusMessage: string;
+  readonly delivery?: {
+    readonly envelope?: ReceivedMessageRecord;
+    readonly hash?: string;
+    readonly timestamp?: string;
+    readonly deliveryTime?: string;
+    readonly acceptanceTime?: string;
+    readonly messageStatus?: number;
+    readonly events: readonly DeliveryEvent[];
+  };
+  readonly rawXml: string;
+}
+
+export interface SignedDeliveryInfoResult {
+  readonly statusCode: string;
+  readonly statusMessage: string;
+  readonly signature?: string;
+  readonly rawXml: string;
+}
+
 function nilElement(name: string): string {
   return `<${name} xsi:nil="true"/>`;
 }
@@ -95,34 +129,77 @@ function boolAttr(xml: string, name: string): boolean | undefined {
   return value === "true" || value === "1";
 }
 
+function elementBody(xml: string, name: string): string | undefined {
+  return new RegExp(`<((?:[\\w.-]+:)?${name})(?:\\s[^>]*)?>([\\s\\S]*?)<\\/\\1>`).exec(xml)?.[2];
+}
+
+function idRequest(operation: string, messageId: string): string {
+  return `<${operation} xmlns="http://isds.czechpoint.cz/v20"><dmID>${escapeXmlText(messageId)}</dmID></${operation}>`;
+}
+
+function parseEnvelope(xml: string, attrs = ""): ReceivedMessageRecord {
+  const record: Record<string, unknown> = {};
+  const fields = {
+    id: firstText(xml, "dmID"),
+    senderBoxId: firstText(xml, "dbIDSender"),
+    sender: firstText(xml, "dmSender"),
+    senderType: numberFrom(xml, "dmSenderType"),
+    recipient: firstText(xml, "dmRecipient"),
+    annotation: firstText(xml, "dmAnnotation"),
+    messageStatus: numberFrom(xml, "dmMessageStatus"),
+    attachmentSizeKb: numberFrom(xml, "dmAttachmentSize"),
+    deliveryTime: firstText(xml, "dmDeliveryTime"),
+    acceptanceTime: firstText(xml, "dmAcceptanceTime"),
+    type: attr(attrs, "dmType"),
+    vodz: boolAttr(attrs, "dmVODZ"),
+    suspiciousFlag: attr(attrs, "specMessFlag") ? Number(attr(attrs, "specMessFlag")) : undefined,
+  };
+  for (const [key, value] of Object.entries(fields)) {
+    if (value !== undefined) record[key] = value;
+  }
+  return record as ReceivedMessageRecord;
+}
+
 function parseRecords(xml: string): ReceivedMessageRecord[] {
   const records: ReceivedMessageRecord[] = [];
   for (const match of xml.matchAll(/<((?:[\w.-]+:)?dmRecord)([^>]*)>([\s\S]*?)<\/\1>/g)) {
     const attrs = match[2] ?? "";
     const body = match[3] ?? "";
-    const record: Record<string, unknown> = {};
-    const fields = {
-      ordinal: numberFrom(body, "dmOrdinal"),
-      id: firstText(body, "dmID"),
-      senderBoxId: firstText(body, "dbIDSender"),
-      sender: firstText(body, "dmSender"),
-      senderType: numberFrom(body, "dmSenderType"),
-      recipient: firstText(body, "dmRecipient"),
-      annotation: firstText(body, "dmAnnotation"),
-      messageStatus: numberFrom(body, "dmMessageStatus"),
-      attachmentSizeKb: numberFrom(body, "dmAttachmentSize"),
-      deliveryTime: firstText(body, "dmDeliveryTime"),
-      acceptanceTime: firstText(body, "dmAcceptanceTime"),
-      type: attr(attrs, "dmType"),
-      vodz: boolAttr(attrs, "dmVODZ"),
-      suspiciousFlag: attr(attrs, "specMessFlag") ? Number(attr(attrs, "specMessFlag")) : undefined,
-    };
-    for (const [key, value] of Object.entries(fields)) {
-      if (value !== undefined) record[key] = value;
-    }
+    const record = parseEnvelope(body, attrs) as Record<string, unknown>;
+    const ordinal = numberFrom(body, "dmOrdinal");
+    if (ordinal !== undefined) record.ordinal = ordinal;
     records.push(record as ReceivedMessageRecord);
   }
   return records;
+}
+
+function parseEvents(xml: string): DeliveryEvent[] {
+  const events: DeliveryEvent[] = [];
+  for (const match of xml.matchAll(/<((?:[\w.-]+:)?dmEvent)(?:\s[^>]*)?>([\s\S]*?)<\/\1>/g)) {
+    const body = match[2] ?? "";
+    const event: Record<string, string> = {};
+    const time = firstText(body, "dmEventTime");
+    const description = firstText(body, "dmEventDescr");
+    if (time) event.time = time;
+    if (description) event.description = description;
+    events.push(event as DeliveryEvent);
+  }
+  return events;
+}
+
+function statusFrom(rawXml: string): { statusCode: string; statusMessage: string } {
+  return {
+    statusCode: firstText(rawXml, "dmStatusCode") ?? "",
+    statusMessage: firstText(rawXml, "dmStatusMessage") ?? "",
+  };
+}
+
+function assertOk(rawXml: string): { statusCode: string; statusMessage: string } {
+  const status = statusFrom(rawXml);
+  if (status.statusCode !== "0000") {
+    throw new IsdsStatusError("ISDS returned an application status error.", status);
+  }
+  return status;
 }
 
 export class MessagesClient {
@@ -148,11 +225,7 @@ export class MessagesClient {
       options.signal ? { signal: options.signal } : {},
     );
 
-    const statusCode = firstText(rawXml, "dmStatusCode") ?? "";
-    const statusMessage = firstText(rawXml, "dmStatusMessage") ?? "";
-    if (statusCode !== "0000") {
-      throw new IsdsStatusError("ISDS returned an application status error.", { statusCode, statusMessage });
-    }
+    const { statusCode, statusMessage } = assertOk(rawXml);
 
     return {
       statusCode,
@@ -179,16 +252,83 @@ export class MessagesClient {
       options.signal ? { signal: options.signal } : {},
     );
 
-    const statusCode = firstText(rawXml, "dmStatusCode") ?? "";
-    const statusMessage = firstText(rawXml, "dmStatusMessage") ?? "";
-    if (statusCode !== "0000") {
-      throw new IsdsStatusError("ISDS returned an application status error.", { statusCode, statusMessage });
-    }
+    const { statusCode, statusMessage } = assertOk(rawXml);
 
     return {
       statusCode,
       statusMessage,
       records: parseRecords(rawXml),
+      rawXml,
+    };
+  }
+
+  async downloadEnvelope(messageId: string, options: { signal?: AbortSignal } = {}): Promise<MessageEnvelopeDownloadResult> {
+    await this.ensureInitialized();
+    const rawXml = await this.raw.invokeGeneratedXml(
+      "MessageEnvelopeDownload",
+      idRequest("MessageEnvelopeDownload", messageId),
+      options.signal ? { signal: options.signal } : {},
+    );
+    const { statusCode, statusMessage } = assertOk(rawXml);
+    const returned = elementBody(rawXml, "dmReturnedMessageEnvelope");
+    const envelopeBody = returned ? elementBody(returned, "dmDm") : undefined;
+    const attrs = /<((?:[\w.-]+:)?dmReturnedMessageEnvelope)([^>]*)>/.exec(rawXml)?.[2] ?? "";
+    return {
+      statusCode,
+      statusMessage,
+      ...(envelopeBody ? { envelope: parseEnvelope(envelopeBody, attrs) } : {}),
+      rawXml,
+    };
+  }
+
+  async getDeliveryInfo(messageId: string, options: { signal?: AbortSignal } = {}): Promise<DeliveryInfoResult> {
+    await this.ensureInitialized();
+    const rawXml = await this.raw.invokeGeneratedXml(
+      "GetDeliveryInfo",
+      idRequest("GetDeliveryInfo", messageId),
+      options.signal ? { signal: options.signal } : {},
+    );
+    const { statusCode, statusMessage } = assertOk(rawXml);
+    const delivery = elementBody(rawXml, "dmDelivery");
+    const dmDm = delivery ? elementBody(delivery, "dmDm") : undefined;
+    const parsedDelivery: Record<string, unknown> = { events: delivery ? parseEvents(delivery) : [] };
+    if (delivery) {
+      if (dmDm) parsedDelivery.envelope = parseEnvelope(dmDm);
+      const hash = firstText(delivery, "dmHash");
+      const timestamp = firstText(delivery, "dmQTimestamp");
+      const deliveryTime = firstText(delivery, "dmDeliveryTime");
+      const acceptanceTime = firstText(delivery, "dmAcceptanceTime");
+      const messageStatus = numberFrom(delivery, "dmMessageStatus");
+      if (hash) parsedDelivery.hash = hash;
+      if (timestamp) parsedDelivery.timestamp = timestamp;
+      if (deliveryTime) parsedDelivery.deliveryTime = deliveryTime;
+      if (acceptanceTime) parsedDelivery.acceptanceTime = acceptanceTime;
+      if (messageStatus !== undefined) parsedDelivery.messageStatus = messageStatus;
+    }
+    if (!delivery) {
+      return { statusCode, statusMessage, rawXml };
+    }
+    return {
+      statusCode,
+      statusMessage,
+      delivery: parsedDelivery as NonNullable<DeliveryInfoResult["delivery"]>,
+      rawXml,
+    };
+  }
+
+  async getSignedDeliveryInfo(messageId: string, options: { signal?: AbortSignal } = {}): Promise<SignedDeliveryInfoResult> {
+    await this.ensureInitialized();
+    const rawXml = await this.raw.invokeGeneratedXml(
+      "GetSignedDeliveryInfo",
+      idRequest("GetSignedDeliveryInfo", messageId),
+      options.signal ? { signal: options.signal } : {},
+    );
+    const { statusCode, statusMessage } = assertOk(rawXml);
+    const signature = firstText(rawXml, "dmSignature");
+    return {
+      statusCode,
+      statusMessage,
+      ...(signature ? { signature } : {}),
       rawXml,
     };
   }

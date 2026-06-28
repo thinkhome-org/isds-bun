@@ -37,6 +37,24 @@ export function startMockIsdsServer(options: MockIsdsServerOptions = {}): Return
           { headers: { "Content-Type": "text/xml" } },
         );
       }
+      if (body.includes("MessageEnvelopeDownload")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><MessageEnvelopeDownloadResponse xmlns="http://isds.czechpoint.cz/v20"><dmReturnedMessageEnvelope dmType="V" dmVODZ="false" attsNum="1"><dmDm><dmID>123456</dmID><dbIDSender>abc123</dbIDSender><dmSender>Sender</dmSender><dmSenderAddress>Address</dmSenderAddress><dmSenderType>10</dmSenderType><dmRecipient>Recipient</dmRecipient><dmRecipientAddress>Recipient Address</dmRecipientAddress><dmAnnotation>Envelope Test</dmAnnotation></dmDm><dmHash>HASH</dmHash><dmQTimestamp>TIMESTAMP</dmQTimestamp><dmDeliveryTime>2026-06-28T00:00:00Z</dmDeliveryTime><dmAcceptanceTime>2026-06-28T00:00:00Z</dmAcceptanceTime><dmMessageStatus>4</dmMessageStatus><dmAttachmentSize>1</dmAttachmentSize></dmReturnedMessageEnvelope><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></MessageEnvelopeDownloadResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("GetDeliveryInfo")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><GetDeliveryInfoResponse xmlns="http://isds.czechpoint.cz/v20"><dmDelivery><dmDm><dmID>123456</dmID><dbIDSender>abc123</dbIDSender><dmSender>Sender</dmSender><dmSenderAddress>Address</dmSenderAddress><dmSenderType>10</dmSenderType><dmRecipient>Recipient</dmRecipient><dmRecipientAddress>Recipient Address</dmRecipientAddress><dmAnnotation>Delivery Test</dmAnnotation></dmDm><dmHash>HASH</dmHash><dmQTimestamp>TIMESTAMP</dmQTimestamp><dmDeliveryTime>2026-06-28T00:00:00Z</dmDeliveryTime><dmAcceptanceTime>2026-06-28T00:00:00Z</dmAcceptanceTime><dmMessageStatus>4</dmMessageStatus><dmEvents><dmEvent><dmEventTime>2026-06-28T00:00:00Z</dmEventTime><dmEventDescr>Delivered</dmEventDescr></dmEvent></dmEvents></dmDelivery><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></GetDeliveryInfoResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("GetSignedDeliveryInfo")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><GetSignedDeliveryInfoResponse xmlns="http://isds.czechpoint.cz/v20"><dmSignature>U0lHTkFUVVJF</dmSignature><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></GetSignedDeliveryInfoResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
       return new Response(
         `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><mock:Ok xmlns:mock="urn:thinkhome:isds:mock">ok</mock:Ok></soap:Body></soap:Envelope>`,
         { headers: { "Content-Type": "text/xml" } },

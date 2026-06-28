@@ -11,7 +11,11 @@ export {
   type ListReceivedMessagesResult,
   type ListSentMessagesOptions,
   type ListSentMessagesResult,
+  type DeliveryEvent,
+  type DeliveryInfoResult,
+  type MessageEnvelopeDownloadResult,
   type ReceivedMessageRecord,
+  type SignedDeliveryInfoResult,
   type SentMessageRecord,
 } from "./messages/index.ts";
 export * from "./xml/index.ts";
