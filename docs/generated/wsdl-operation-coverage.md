@@ -6,33 +6,33 @@ Status: generated from official production WSDL/XSD artifacts.
 |---|---:|
 | WSDL operations discovered | 45 |
 | Raw methods generated | 45 |
-| High-level wrappers complete | 23 |
-| Contract fixtures | 23 |
+| High-level wrappers complete | 43 |
+| Contract fixtures | 43 |
 | Raw operation coverage | 100% |
-| High-level coverage | 51% |
+| High-level coverage | 96% |
 
 | Service | Operation | Endpoint | Raw | High-level | Fixture | Test |
 |---|---|---|---:|---:|---:|---:|
-| DataBoxAccess | `GetOwnerInfoFromLogin` | info | yes | no | no | no |
-| DataBoxAccess | `GetOwnerInfoFromLogin2` | info | yes | no | no | no |
-| DataBoxAccess | `GetUserInfoFromLogin` | info | yes | no | no | no |
-| DataBoxAccess | `GetUserInfoFromLogin2` | info | yes | no | no | no |
-| DataBoxAccess | `ChangeISDSPassword` | info | yes | no | no | no |
-| DataBoxAccess | `GetPasswordInfo` | info | yes | no | no | no |
-| DataBoxSearch | `FindDataBox` | search | yes | no | no | no |
-| DataBoxSearch | `FindDataBox2` | search | yes | no | no | no |
-| DataBoxSearch | `CheckDataBox` | search | yes | no | no | no |
-| DataBoxSearch | `GetDataBoxList` | search | yes | no | no | no |
-| DataBoxSearch | `PDZInfo` | search | yes | no | no | no |
-| DataBoxSearch | `DataBoxCreditInfo` | search | yes | no | no | no |
-| DataBoxSearch | `ISDSSearch2` | search | yes | no | no | no |
-| DataBoxSearch | `ISDSSearch3` | search | yes | no | no | no |
-| DataBoxSearch | `GetDataBoxActivityStatus` | search | yes | no | no | no |
-| DataBoxSearch | `FindPersonalDataBox` | search | yes | no | no | no |
-| DataBoxSearch | `DTInfo` | search | yes | no | no | no |
-| DataBoxSearch | `PDZSendInfo` | search | yes | no | no | no |
-| DataBoxSearch | `GetConstants` | search | yes | no | no | no |
-| DataBoxSearch | `GetDataBoxAddress` | search | yes | no | no | no |
+| DataBoxAccess | `GetOwnerInfoFromLogin` | info | yes | yes | yes | yes |
+| DataBoxAccess | `GetOwnerInfoFromLogin2` | info | yes | yes | yes | yes |
+| DataBoxAccess | `GetUserInfoFromLogin` | info | yes | yes | yes | yes |
+| DataBoxAccess | `GetUserInfoFromLogin2` | info | yes | yes | yes | yes |
+| DataBoxAccess | `ChangeISDSPassword` | info | yes | yes | yes | yes |
+| DataBoxAccess | `GetPasswordInfo` | info | yes | yes | yes | yes |
+| DataBoxSearch | `FindDataBox` | search | yes | yes | yes | yes |
+| DataBoxSearch | `FindDataBox2` | search | yes | yes | yes | yes |
+| DataBoxSearch | `CheckDataBox` | search | yes | yes | yes | yes |
+| DataBoxSearch | `GetDataBoxList` | search | yes | yes | yes | yes |
+| DataBoxSearch | `PDZInfo` | search | yes | yes | yes | yes |
+| DataBoxSearch | `DataBoxCreditInfo` | search | yes | yes | yes | yes |
+| DataBoxSearch | `ISDSSearch2` | search | yes | yes | yes | yes |
+| DataBoxSearch | `ISDSSearch3` | search | yes | yes | yes | yes |
+| DataBoxSearch | `GetDataBoxActivityStatus` | search | yes | yes | yes | yes |
+| DataBoxSearch | `FindPersonalDataBox` | search | yes | yes | yes | yes |
+| DataBoxSearch | `DTInfo` | search | yes | yes | yes | yes |
+| DataBoxSearch | `PDZSendInfo` | search | yes | yes | yes | yes |
+| DataBoxSearch | `GetConstants` | search | yes | yes | yes | yes |
+| DataBoxSearch | `GetDataBoxAddress` | search | yes | yes | yes | yes |
 | dmInfoWebService | `VerifyMessage` | messages | yes | yes | yes | yes |
 | dmInfoWebService | `MessageEnvelopeDownload` | messages | yes | yes | yes | yes |
 | dmInfoWebService | `MarkMessageAsDownloaded` | messages | yes | yes | yes | yes |

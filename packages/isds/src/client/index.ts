@@ -4,6 +4,7 @@
 import { createAuthenticationAdapter, type IsdsAuthentication } from "../auth/index.ts";
 import { mergeCapabilities, NO_CAPABILITIES, type IsdsCapabilities } from "../capabilities/index.ts";
 import { resolveEnvironment, type IsdsEnvironment, type ResolvedIsdsEnvironment } from "../config/environment.ts";
+import { DataBoxesClient } from "../data-boxes/index.ts";
 import { MessagesClient } from "../messages/index.ts";
 import { RawSoapClient } from "../raw/index.ts";
 import { BunFetchTransport, type IsdsTlsOptions } from "../transport/index.ts";
@@ -25,12 +26,12 @@ export interface IsdsClient {
   readonly messages: MessagesClient;
   readonly attachments: UnsupportedModule;
   readonly vodz: UnsupportedModule;
-  readonly search: UnsupportedModule;
-  readonly dataBoxes: UnsupportedModule;
-  readonly users: UnsupportedModule;
+  readonly search: DataBoxesClient;
+  readonly dataBoxes: DataBoxesClient;
+  readonly users: DataBoxesClient;
   readonly administration: UnsupportedModule;
-  readonly pdz: UnsupportedModule;
-  readonly credit: UnsupportedModule;
+  readonly pdz: DataBoxesClient;
+  readonly credit: DataBoxesClient;
   readonly notifications: UnsupportedModule;
   readonly archive: UnsupportedModule;
   readonly gateway: UnsupportedModule;
@@ -65,6 +66,7 @@ export function createIsdsClient(options: CreateIsdsClientOptions): IsdsClient {
     initialized = true;
   }
 
+  const dataBoxes = new DataBoxesClient(raw, ensureInitialized);
   return {
     environment,
     raw,
@@ -78,12 +80,12 @@ export function createIsdsClient(options: CreateIsdsClientOptions): IsdsClient {
     messages: new MessagesClient(raw, ensureInitialized),
     attachments: createUnsupportedModule("attachments"),
     vodz: createUnsupportedModule("vodz"),
-    search: createUnsupportedModule("search"),
-    dataBoxes: createUnsupportedModule("dataBoxes"),
-    users: createUnsupportedModule("users"),
+    search: dataBoxes,
+    dataBoxes,
+    users: dataBoxes,
     administration: createUnsupportedModule("administration"),
-    pdz: createUnsupportedModule("pdz"),
-    credit: createUnsupportedModule("credit"),
+    pdz: dataBoxes,
+    credit: dataBoxes,
     notifications: createUnsupportedModule("notifications"),
     archive: createUnsupportedModule("archive"),
     gateway: createUnsupportedModule("gateway"),

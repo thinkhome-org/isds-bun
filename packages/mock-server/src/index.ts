@@ -25,6 +25,126 @@ export function startMockIsdsServer(options: MockIsdsServerOptions = {}): Return
           { headers: { "Content-Type": "text/xml" } },
         );
       }
+      if (body.includes("GetOwnerInfoFromLogin2")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><GetOwnerInfoFromLogin2Response xmlns="http://isds.czechpoint.cz/v20"><dbOwnerInfo><dbID>abc123</dbID><aifoIsds>true</aifoIsds><dbType>PO</dbType><ic>12345678</ic><firmName>ThinkHome s.r.o.</firmName><adCity>Praha</adCity><adZipCode>11000</adZipCode><dbState>1</dbState><dbOpenAddressing>true</dbOpenAddressing><dbIdOVM>ovm-1</dbIdOVM></dbOwnerInfo><dbStatus><dbStatusCode>0000</dbStatusCode><dbStatusMessage>OK</dbStatusMessage></dbStatus></GetOwnerInfoFromLogin2Response></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("GetOwnerInfoFromLogin")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><GetOwnerInfoFromLoginResponse xmlns="http://isds.czechpoint.cz/v20"><dbOwnerInfo><dbID>abc123</dbID><dbType>PO</dbType><ic>12345678</ic><firmName>ThinkHome s.r.o.</firmName><adCity>Praha</adCity><dbState>1</dbState></dbOwnerInfo><dbStatus><dbStatusCode>0000</dbStatusCode><dbStatusMessage>OK</dbStatusMessage></dbStatus></GetOwnerInfoFromLoginResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("GetUserInfoFromLogin2")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><GetUserInfoFromLogin2Response xmlns="http://isds.czechpoint.cz/v20"><dbUserInfo><aifoIsds>true</aifoIsds><pnFirstName>Test</pnFirstName><pnLastName>User</pnLastName><adCity>Praha</adCity><isdsID>isds-user-1</isdsID><userType>PRIMARY_USER</userType><userPrivils>255</userPrivils></dbUserInfo><dbStatus><dbStatusCode>0000</dbStatusCode><dbStatusMessage>OK</dbStatusMessage></dbStatus></GetUserInfoFromLogin2Response></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("GetUserInfoFromLogin")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><GetUserInfoFromLoginResponse xmlns="http://isds.czechpoint.cz/v20"><dbUserInfo><pnFirstName>Test</pnFirstName><pnLastName>User</pnLastName><adCity>Praha</adCity><userID>usr001</userID><userType>PRIMARY_USER</userType><userPrivils>255</userPrivils></dbUserInfo><dbStatus><dbStatusCode>0000</dbStatusCode><dbStatusMessage>OK</dbStatusMessage></dbStatus></GetUserInfoFromLoginResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("GetPasswordInfo")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><GetPasswordInfoResponse xmlns="http://isds.czechpoint.cz/v20"><pswExpDate>2027-01-01T00:00:00+01:00</pswExpDate><dbStatus><dbStatusCode>0000</dbStatusCode><dbStatusMessage>OK</dbStatusMessage></dbStatus></GetPasswordInfoResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("ChangeISDSPassword")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><ChangeISDSPasswordResponse xmlns="http://isds.czechpoint.cz/v20"><dbStatus><dbStatusCode>0000</dbStatusCode><dbStatusMessage>OK</dbStatusMessage></dbStatus></ChangeISDSPasswordResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("FindDataBox2")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><FindDataBox2Response xmlns="http://isds.czechpoint.cz/v20"><dbResults><dbOwnerInfo><dbID>abc123</dbID><aifoIsds>true</aifoIsds><dbType>PO</dbType><ic>12345678</ic><firmName>ThinkHome s.r.o.</firmName><adCity>Praha</adCity><dbState>1</dbState><dbOpenAddressing>true</dbOpenAddressing></dbOwnerInfo></dbResults><dbStatus><dbStatusCode>0000</dbStatusCode><dbStatusMessage>OK</dbStatusMessage></dbStatus></FindDataBox2Response></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("FindDataBox")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><FindDataBoxResponse xmlns="http://isds.czechpoint.cz/v20"><dbResults><dbOwnerInfo><dbID>abc123</dbID><dbType>PO</dbType><ic>12345678</ic><firmName>ThinkHome s.r.o.</firmName><adCity>Praha</adCity><dbState>1</dbState></dbOwnerInfo></dbResults><dbStatus><dbStatusCode>0000</dbStatusCode><dbStatusMessage>OK</dbStatusMessage></dbStatus></FindDataBoxResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("CheckDataBox")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><CheckDataBoxResponse xmlns="http://isds.czechpoint.cz/v20"><dbState>1</dbState><dbStatus><dbStatusCode>0000</dbStatusCode><dbStatusMessage>OK</dbStatusMessage></dbStatus></CheckDataBoxResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("GetDataBoxList")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><GetDataBoxListResponse xmlns="http://isds.czechpoint.cz/v20"><dblData>REJMSVNURA==</dblData><dbStatus><dbStatusCode>0000</dbStatusCode><dbStatusMessage>OK</dbStatusMessage></dbStatus></GetDataBoxListResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("PDZInfo")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><PDZInfoResponse xmlns="http://isds.czechpoint.cz/v20"><dbPDZRecords><dbPDZRecord><PDZType>K</PDZType><PDZRecip>def456</PDZRecip><PDZPayer>abc123</PDZPayer><PDZExpire>2027-01-01T00:00:00+01:00</PDZExpire><PDZCnt>5</PDZCnt><ODZIdent>odz-1</ODZIdent></dbPDZRecord></dbPDZRecords><dbStatus><dbStatusCode>0000</dbStatusCode><dbStatusMessage>OK</dbStatusMessage></dbStatus></PDZInfoResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("DataBoxCreditInfo")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><DataBoxCreditInfoResponse xmlns="http://isds.czechpoint.cz/v20"><currentCredit>100</currentCredit><notifEmail>ops@example.test</notifEmail><ciRecords><ciRecord><ciEventTime>2026-06-28T00:00:00+02:00</ciEventTime><ciEventType>1</ciEventType><ciCreditChange>100</ciCreditChange><ciCreditAfter>100</ciCreditAfter><ciTransID>tx-1</ciTransID></ciRecord></ciRecords><dbStatus><dbStatusCode>0000</dbStatusCode><dbStatusMessage>OK</dbStatusMessage></dbStatus></DataBoxCreditInfoResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("ISDSSearch3")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><ISDSSearch3Response xmlns="http://isds.czechpoint.cz/v20"><totalCount>1</totalCount><currentCount>1</currentCount><position>1</position><lastPage>true</lastPage><dbResults><dbResult><dbID>abc123</dbID><dbType>PO</dbType><dbName>ThinkHome s.r.o.</dbName><dbAddress>Praha</dbAddress><dbBiDate>2020-01-01</dbBiDate><dbICO>12345678</dbICO><dbIdOVM>ovm-1</dbIdOVM><dbSendOptions>ALL</dbSendOptions></dbResult></dbResults><dbStatus><dbStatusCode>0000</dbStatusCode><dbStatusMessage>OK</dbStatusMessage></dbStatus></ISDSSearch3Response></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("ISDSSearch2")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><ISDSSearch2Response xmlns="http://isds.czechpoint.cz/v20"><totalCount>1</totalCount><currentCount>1</currentCount><position>1</position><lastPage>true</lastPage><dbResults><dbResult><dbID>abc123</dbID><dbType>PO</dbType><dbName>ThinkHome s.r.o.</dbName><dbAddress>Praha</dbAddress><dbBiDate>2020-01-01</dbBiDate><dbICO>12345678</dbICO><dbEffectiveOVM>false</dbEffectiveOVM><dbSendOptions>ALL</dbSendOptions></dbResult></dbResults><dbStatus><dbStatusCode>0000</dbStatusCode><dbStatusMessage>OK</dbStatusMessage></dbStatus></ISDSSearch2Response></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("GetDataBoxActivityStatus")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><GetDataBoxActivityStatusResponse xmlns="http://isds.czechpoint.cz/v20"><dbID>abc123</dbID><Periods><Period><PeriodFrom>2026-01-01T00:00:00+01:00</PeriodFrom><PeriodTo>2026-12-31T23:59:59+01:00</PeriodTo><DbState>1</DbState></Period></Periods><dbStatus><dbStatusCode>0000</dbStatusCode><dbStatusMessage>OK</dbStatusMessage></dbStatus></GetDataBoxActivityStatusResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("FindPersonalDataBox")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><FindPersonalDataBoxResponse xmlns="http://isds.czechpoint.cz/v20"><dbResults><dbOwnerInfo><dbID>pers01</dbID><aifoIsds>true</aifoIsds><pnFirstName>Personal</pnFirstName><pnLastName>Owner</pnLastName><adCity>Praha</adCity></dbOwnerInfo></dbResults><dbStatus><dbStatusCode>0000</dbStatusCode><dbStatusMessage>OK</dbStatusMessage></dbStatus></FindPersonalDataBoxResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("DTInfo")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><DTInfoResponse xmlns="http://isds.czechpoint.cz/v20"><ActDTType>1</ActDTType><ActDTCapacity>1000</ActDTCapacity><ActDTFrom>2026-01-01</ActDTFrom><ActDTTo>2026-12-31</ActDTTo><ActDTCapUsed>10</ActDTCapUsed><FutDTType>2</FutDTType><FutDTCapacity>2000</FutDTCapacity><FutDTFrom>2027-01-01</FutDTFrom><FutDTTo>2027-12-31</FutDTTo><FutDTPaid>1</FutDTPaid><dbStatus><dbStatusCode>0000</dbStatusCode><dbStatusMessage>OK</dbStatusMessage></dbStatus></DTInfoResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("PDZSendInfo")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><PDZSendInfoResponse xmlns="http://isds.czechpoint.cz/v20"><PDZsiResult>true</PDZsiResult><dbStatus><dbStatusCode>0000</dbStatusCode><dbStatusMessage>OK</dbStatusMessage></dbStatus></PDZSendInfoResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("GetConstants")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><GetConstantsResponse xmlns="http://isds.czechpoint.cz/v20"><constRecords><constRecord><cName>MAX_ATTACHMENT_SIZE</cName><cValue>20MB</cValue><cFrom>2026-01-01</cFrom><cTo>2026-12-31</cTo></constRecord></constRecords><dbStatus><dbStatusCode>0000</dbStatusCode><dbStatusMessage>OK</dbStatusMessage></dbStatus></GetConstantsResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("GetDataBoxAddress")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><GetDataBoxAddressResponse xmlns="http://isds.czechpoint.cz/v20"><adCity>Praha</adCity><adDistrict>Praha 1</adDistrict><adStreet>Testovaci</adStreet><adNumberInStreet>1</adNumberInStreet><adNumberInMunicipality>10</adNumberInMunicipality><adZipCode>11000</adZipCode><adState>CZ</adState><adRegistrationNumber>reg-1</adRegistrationNumber><adFullAddress1>Testovaci 1, Praha</adFullAddress1><adFullAddress2>CZ</adFullAddress2><dbStatus><dbStatusCode>0000</dbStatusCode><dbStatusMessage>OK</dbStatusMessage></dbStatus></GetDataBoxAddressResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
       if (body.includes("VerifyMessage")) {
         return new Response(
           `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><VerifyMessageResponse xmlns="http://isds.czechpoint.cz/v20"><dmHash algorithm="SHA-256">SEFTSA==</dmHash><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></VerifyMessageResponse></soap:Body></soap:Envelope>`,

@@ -3,11 +3,11 @@
   "source": "official-datovka-v20",
   "operationsDiscovered": 45,
   "rawMethodsGenerated": 45,
-  "highLevelWrappersComplete": 23,
-  "contractFixtures": 23,
+  "highLevelWrappersComplete": 43,
+  "contractFixtures": 43,
   "coveragePercent": 100,
   "rawCoveragePercent": 100,
-  "highLevelCoveragePercent": 51,
+  "highLevelCoveragePercent": 96,
   "operations": [
     {
       "operation": "GetOwnerInfoFromLogin",
@@ -23,9 +23,9 @@
       "responseMessage": "GetOwnerInfoFromLoginResponse",
       "sourceWsdl": "db_access.wsdl",
       "sourceWsdlSha256": "c655b2e1cbe6b4f81ac707f9fac555fe056d2e91a81de71e305e320de99569ea",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "GetOwnerInfoFromLogin2",
@@ -41,9 +41,9 @@
       "responseMessage": "GetOwnerInfoFromLogin2Response",
       "sourceWsdl": "db_access.wsdl",
       "sourceWsdlSha256": "c655b2e1cbe6b4f81ac707f9fac555fe056d2e91a81de71e305e320de99569ea",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "GetUserInfoFromLogin",
@@ -59,9 +59,9 @@
       "responseMessage": "GetUserInfoFromLoginResponse",
       "sourceWsdl": "db_access.wsdl",
       "sourceWsdlSha256": "c655b2e1cbe6b4f81ac707f9fac555fe056d2e91a81de71e305e320de99569ea",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "GetUserInfoFromLogin2",
@@ -77,9 +77,9 @@
       "responseMessage": "GetUserInfoFromLogin2Response",
       "sourceWsdl": "db_access.wsdl",
       "sourceWsdlSha256": "c655b2e1cbe6b4f81ac707f9fac555fe056d2e91a81de71e305e320de99569ea",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "ChangeISDSPassword",
@@ -95,9 +95,9 @@
       "responseMessage": "ChangeISDSPasswordResponse",
       "sourceWsdl": "db_access.wsdl",
       "sourceWsdlSha256": "c655b2e1cbe6b4f81ac707f9fac555fe056d2e91a81de71e305e320de99569ea",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "GetPasswordInfo",
@@ -113,9 +113,9 @@
       "responseMessage": "GetPasswordInfoResponse",
       "sourceWsdl": "db_access.wsdl",
       "sourceWsdlSha256": "c655b2e1cbe6b4f81ac707f9fac555fe056d2e91a81de71e305e320de99569ea",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "FindDataBox",
@@ -131,9 +131,9 @@
       "responseMessage": "FindDataBoxResponse",
       "sourceWsdl": "db_search.wsdl",
       "sourceWsdlSha256": "e4540467025adbdf097803e741dc604eaef24fdf26ce7d38e4f5f590b2f53670",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "FindDataBox2",
@@ -149,9 +149,9 @@
       "responseMessage": "FindDataBox2Response",
       "sourceWsdl": "db_search.wsdl",
       "sourceWsdlSha256": "e4540467025adbdf097803e741dc604eaef24fdf26ce7d38e4f5f590b2f53670",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "CheckDataBox",
@@ -167,9 +167,9 @@
       "responseMessage": "CheckDataBoxResponse",
       "sourceWsdl": "db_search.wsdl",
       "sourceWsdlSha256": "e4540467025adbdf097803e741dc604eaef24fdf26ce7d38e4f5f590b2f53670",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "GetDataBoxList",
@@ -185,9 +185,9 @@
       "responseMessage": "GetDataBoxListResponse",
       "sourceWsdl": "db_search.wsdl",
       "sourceWsdlSha256": "e4540467025adbdf097803e741dc604eaef24fdf26ce7d38e4f5f590b2f53670",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "PDZInfo",
@@ -203,9 +203,9 @@
       "responseMessage": "PDZInfoResponse",
       "sourceWsdl": "db_search.wsdl",
       "sourceWsdlSha256": "e4540467025adbdf097803e741dc604eaef24fdf26ce7d38e4f5f590b2f53670",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "DataBoxCreditInfo",
@@ -221,9 +221,9 @@
       "responseMessage": "DataBoxCreditInfoResponse",
       "sourceWsdl": "db_search.wsdl",
       "sourceWsdlSha256": "e4540467025adbdf097803e741dc604eaef24fdf26ce7d38e4f5f590b2f53670",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "ISDSSearch2",
@@ -239,9 +239,9 @@
       "responseMessage": "ISDSSearch2Response",
       "sourceWsdl": "db_search.wsdl",
       "sourceWsdlSha256": "e4540467025adbdf097803e741dc604eaef24fdf26ce7d38e4f5f590b2f53670",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "ISDSSearch3",
@@ -257,9 +257,9 @@
       "responseMessage": "ISDSSearch3Response",
       "sourceWsdl": "db_search.wsdl",
       "sourceWsdlSha256": "e4540467025adbdf097803e741dc604eaef24fdf26ce7d38e4f5f590b2f53670",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "GetDataBoxActivityStatus",
@@ -275,9 +275,9 @@
       "responseMessage": "GetDataBoxActivityStatusResponse",
       "sourceWsdl": "db_search.wsdl",
       "sourceWsdlSha256": "e4540467025adbdf097803e741dc604eaef24fdf26ce7d38e4f5f590b2f53670",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "FindPersonalDataBox",
@@ -293,9 +293,9 @@
       "responseMessage": "FindPersonalDataBoxResponse",
       "sourceWsdl": "db_search.wsdl",
       "sourceWsdlSha256": "e4540467025adbdf097803e741dc604eaef24fdf26ce7d38e4f5f590b2f53670",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "DTInfo",
@@ -311,9 +311,9 @@
       "responseMessage": "DTInfoResponse",
       "sourceWsdl": "db_search.wsdl",
       "sourceWsdlSha256": "e4540467025adbdf097803e741dc604eaef24fdf26ce7d38e4f5f590b2f53670",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "PDZSendInfo",
@@ -329,9 +329,9 @@
       "responseMessage": "PDZSendInfoResponse",
       "sourceWsdl": "db_search.wsdl",
       "sourceWsdlSha256": "e4540467025adbdf097803e741dc604eaef24fdf26ce7d38e4f5f590b2f53670",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "GetConstants",
@@ -347,9 +347,9 @@
       "responseMessage": "GetConstantsResponse",
       "sourceWsdl": "db_search.wsdl",
       "sourceWsdlSha256": "e4540467025adbdf097803e741dc604eaef24fdf26ce7d38e4f5f590b2f53670",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "GetDataBoxAddress",
@@ -365,9 +365,9 @@
       "responseMessage": "GetDataBoxAddressResponse",
       "sourceWsdl": "db_search.wsdl",
       "sourceWsdlSha256": "e4540467025adbdf097803e741dc604eaef24fdf26ce7d38e4f5f590b2f53670",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "VerifyMessage",

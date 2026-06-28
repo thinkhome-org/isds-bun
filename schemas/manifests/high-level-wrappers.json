@@ -1,5 +1,125 @@
 {
   "operations": {
+    "GetOwnerInfoFromLogin": {
+      "module": "dataBoxes",
+      "method": "getOwnerInfoLegacy",
+      "fixture": true,
+      "test": true
+    },
+    "GetOwnerInfoFromLogin2": {
+      "module": "dataBoxes",
+      "method": "getOwnerInfo",
+      "fixture": true,
+      "test": true
+    },
+    "GetUserInfoFromLogin": {
+      "module": "users",
+      "method": "getUserInfoLegacy",
+      "fixture": true,
+      "test": true
+    },
+    "GetUserInfoFromLogin2": {
+      "module": "users",
+      "method": "getUserInfo",
+      "fixture": true,
+      "test": true
+    },
+    "ChangeISDSPassword": {
+      "module": "users",
+      "method": "changePassword",
+      "fixture": true,
+      "test": true
+    },
+    "GetPasswordInfo": {
+      "module": "users",
+      "method": "getPasswordInfo",
+      "fixture": true,
+      "test": true
+    },
+    "FindDataBox": {
+      "module": "dataBoxes",
+      "method": "findDataBoxesLegacy",
+      "fixture": true,
+      "test": true
+    },
+    "FindDataBox2": {
+      "module": "dataBoxes",
+      "method": "findDataBoxes",
+      "fixture": true,
+      "test": true
+    },
+    "CheckDataBox": {
+      "module": "dataBoxes",
+      "method": "checkDataBox",
+      "fixture": true,
+      "test": true
+    },
+    "GetDataBoxList": {
+      "module": "dataBoxes",
+      "method": "getDataBoxList",
+      "fixture": true,
+      "test": true
+    },
+    "PDZInfo": {
+      "module": "pdz",
+      "method": "pdzInfo",
+      "fixture": true,
+      "test": true
+    },
+    "DataBoxCreditInfo": {
+      "module": "credit",
+      "method": "creditInfo",
+      "fixture": true,
+      "test": true
+    },
+    "ISDSSearch2": {
+      "module": "search",
+      "method": "searchLegacy",
+      "fixture": true,
+      "test": true
+    },
+    "ISDSSearch3": {
+      "module": "search",
+      "method": "search",
+      "fixture": true,
+      "test": true
+    },
+    "GetDataBoxActivityStatus": {
+      "module": "dataBoxes",
+      "method": "getActivityStatus",
+      "fixture": true,
+      "test": true
+    },
+    "FindPersonalDataBox": {
+      "module": "dataBoxes",
+      "method": "findPersonalDataBox",
+      "fixture": true,
+      "test": true
+    },
+    "DTInfo": {
+      "module": "dataBoxes",
+      "method": "dtInfo",
+      "fixture": true,
+      "test": true
+    },
+    "PDZSendInfo": {
+      "module": "pdz",
+      "method": "pdzSendInfo",
+      "fixture": true,
+      "test": true
+    },
+    "GetConstants": {
+      "module": "search",
+      "method": "getConstants",
+      "fixture": true,
+      "test": true
+    },
+    "GetDataBoxAddress": {
+      "module": "dataBoxes",
+      "method": "getAddress",
+      "fixture": true,
+      "test": true
+    },
     "VerifyMessage": {
       "module": "messages",
       "method": "verifyMessage",
