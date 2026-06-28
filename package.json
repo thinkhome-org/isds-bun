@@ -24,7 +24,7 @@
     "generate:check": "bun scripts/verify-generated.ts",
     "build": "bun scripts/build.ts",
     "build:executables": "bun scripts/build-executables.ts",
-    "pack": "bun pm pack",
+    "pack": "cd packages/isds && bun pm pack",
     "release:check": "bun scripts/release.ts --check"
   },
   "devDependencies": {

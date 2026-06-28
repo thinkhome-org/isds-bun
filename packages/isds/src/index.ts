@@ -4,7 +4,14 @@
 export { createIsdsClient, type CreateIsdsClientOptions, type IsdsClient } from "./client/index.ts";
 export { resolveEnvironment, type IsdsEnvironment, type IsdsEndpointMap } from "./config/environment.ts";
 export { loadIsdsConfig, resolveProfile, standardUserConfigPath, type IsdsConfig, type IsdsProfile, type ResolvedProfile } from "./config/profiles.ts";
-export { type IsdsAuthentication, PasswordAuthAdapter } from "./auth/index.ts";
+export {
+  BunSecretStore,
+  DEFAULT_SECRET_SERVICE,
+  type IsdsAuthentication,
+  type IsdsSecretReference,
+  type IsdsSecretStore,
+  PasswordAuthAdapter,
+} from "./auth/index.ts";
 export { type IsdsCapabilities } from "./capabilities/index.ts";
 export {
   DataBoxesClient,

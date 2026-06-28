@@ -3,7 +3,7 @@
 
 import coverage from "../../../../schemas/manifests/operation-coverage.json" with { type: "json" };
 import { createIsdsClient } from "../client/index.ts";
-import type { IsdsAuthentication } from "../auth/index.ts";
+import { BunSecretStore, DEFAULT_SECRET_SERVICE, type IsdsAuthentication, type IsdsSecretStore } from "../auth/index.ts";
 import { IsdsConfigurationError } from "../errors/index.ts";
 import { loadIsdsConfig, resolveProfile } from "../config/profiles.ts";
 import type { IsdsEnvironment } from "../config/environment.ts";
@@ -43,11 +43,30 @@ function requiresAuthentication(authentication: IsdsAuthentication, command: str
   return false;
 }
 
-export async function runCli(args: readonly string[] = Bun.argv.slice(2)): Promise<number> {
+export interface RunCliOptions {
+  readonly secrets?: IsdsSecretStore;
+  readonly readStdin?: () => Promise<string>;
+}
+
+function secretService(args: readonly string[]): string {
+  return flagValue(args, "--service") ?? DEFAULT_SECRET_SERVICE;
+}
+
+function stripOneTrailingNewline(value: string): string {
+  return value.endsWith("\r\n") ? value.slice(0, -2) : value.endsWith("\n") ? value.slice(0, -1) : value;
+}
+
+async function readSecretValue(args: readonly string[], options: RunCliOptions): Promise<string | undefined> {
+  if (!flag(args, "--value-stdin")) return undefined;
+  return stripOneTrailingNewline(await (options.readStdin ?? (() => Bun.stdin.text()))());
+}
+
+export async function runCli(args: readonly string[] = Bun.argv.slice(2), options: RunCliOptions = {}): Promise<number> {
   const [command, subcommand] = args;
+  const secrets = options.secrets ?? new BunSecretStore();
 
   if (!command || command === "help" || command === "--help" || command === "-h") {
-    console.log("Usage: isds <version|doctor|schema status|profile list|profile show|inbox list|sent list|tui> [--profile name] [--environment production|public-test] [--config path]");
+    console.log("Usage: isds <version|doctor|schema status|profile list|profile show|profile secret-status|secret set|secret status|secret delete|inbox list|sent list|tui> [--profile name] [--environment production|public-test] [--config path]");
     return 0;
   }
 
@@ -63,6 +82,47 @@ export async function runCli(args: readonly string[] = Bun.argv.slice(2)): Promi
 
   if (command === "schema" && subcommand === "status") {
     console.log(JSON.stringify(coverage, null, 2));
+    return 0;
+  }
+
+  if (command === "secret" && subcommand === "status") {
+    const name = flagValue(args, "--name");
+    if (!name) {
+      console.error("Secret name is required. Use --name.");
+      return 2;
+    }
+    const service = secretService(args);
+    const configured = await secrets.get({ service, name }) !== null;
+    console.log(JSON.stringify({ service, name, configured }, null, 2));
+    return 0;
+  }
+
+  if (command === "secret" && subcommand === "set") {
+    const name = flagValue(args, "--name");
+    if (!name) {
+      console.error("Secret name is required. Use --name.");
+      return 2;
+    }
+    const value = await readSecretValue(args, options);
+    if (value === undefined) {
+      console.error("Secret value must be provided through --value-stdin.");
+      return 2;
+    }
+    const service = secretService(args);
+    await secrets.set({ service, name }, value);
+    console.log(JSON.stringify({ service, name, stored: true }, null, 2));
+    return 0;
+  }
+
+  if (command === "secret" && subcommand === "delete") {
+    const name = flagValue(args, "--name");
+    if (!name) {
+      console.error("Secret name is required. Use --name.");
+      return 2;
+    }
+    const service = secretService(args);
+    const deleted = await secrets.delete({ service, name });
+    console.log(JSON.stringify({ service, name, deleted }, null, 2));
     return 0;
   }
 
@@ -90,6 +150,32 @@ export async function runCli(args: readonly string[] = Bun.argv.slice(2)): Promi
       usernameSecret: profile.usernameSecret ?? null,
       passwordSecret: profile.passwordSecret ? "[configured]" : null,
       secretService: profile.secretService ?? null,
+    }, null, 2));
+    return 0;
+  }
+
+  if (command === "profile" && subcommand === "secret-status") {
+    const name = flagValue(args, "--profile");
+    const configPath = flagValue(args, "--config");
+    const config = await loadIsdsConfig({ ...(configPath ? { configPath } : {}) });
+    const profileName = name ?? config.defaultProfile;
+    if (!profileName || !config.profiles[profileName]) {
+      console.error("Profile not found. Use --profile or configure defaultProfile.");
+      return 2;
+    }
+    const profile = config.profiles[profileName];
+    const service = profile.secretService ?? DEFAULT_SECRET_SERVICE;
+    const usernameConfigured = profile.usernameSecret
+      ? await secrets.get({ service, name: profile.usernameSecret }) !== null
+      : null;
+    const passwordConfigured = profile.passwordSecret
+      ? await secrets.get({ service, name: profile.passwordSecret }) !== null
+      : null;
+    console.log(JSON.stringify({
+      name: profileName,
+      service,
+      usernameSecret: profile.usernameSecret ? { name: profile.usernameSecret, configured: usernameConfigured } : null,
+      passwordSecret: profile.passwordSecret ? { name: profile.passwordSecret, configured: passwordConfigured } : null,
     }, null, 2));
     return 0;
   }

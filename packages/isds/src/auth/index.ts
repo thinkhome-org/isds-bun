@@ -40,13 +40,43 @@ export type PasswordAuthentication =
 
 export type IsdsAuthentication = PasswordAuthentication | { type: "none" };
 
+export const DEFAULT_SECRET_SERVICE = "thinkhome-isds";
+
+export interface IsdsSecretReference {
+  readonly service: string;
+  readonly name: string;
+}
+
+export interface IsdsSecretStore {
+  get(reference: IsdsSecretReference): Promise<string | null>;
+  set(reference: IsdsSecretReference, value: string): Promise<void>;
+  delete(reference: IsdsSecretReference): Promise<boolean>;
+}
+
 type BunSecrets = {
   get?: (options: { service: string; name: string }) => Promise<string | null>;
+  set?: (options: { service: string; name: string }, value: string) => Promise<void>;
+  delete?: (options: { service: string; name: string }) => Promise<boolean>;
 };
 
-async function readBunSecret(service: string, name: string): Promise<string | null> {
-  const secrets = (Bun as unknown as { secrets?: BunSecrets }).secrets;
-  return (await secrets?.get?.({ service, name })) ?? null;
+export class BunSecretStore implements IsdsSecretStore {
+  #secrets(): BunSecrets | undefined {
+    return (Bun as unknown as { secrets?: BunSecrets }).secrets;
+  }
+
+  async get(reference: IsdsSecretReference): Promise<string | null> {
+    return (await this.#secrets()?.get?.(reference)) ?? null;
+  }
+
+  async set(reference: IsdsSecretReference, value: string): Promise<void> {
+    const set = this.#secrets()?.set;
+    if (!set) throw new IsdsConfigurationError("Bun.secrets.set is not available in this runtime.");
+    await set(reference, value);
+  }
+
+  async delete(reference: IsdsSecretReference): Promise<boolean> {
+    return (await this.#secrets()?.delete?.(reference)) ?? false;
+  }
 }
 
 export class PasswordAuthAdapter implements IsdsAuthenticationAdapter {
@@ -54,7 +84,10 @@ export class PasswordAuthAdapter implements IsdsAuthenticationAdapter {
   #username: string | undefined;
   #password: string | undefined;
 
-  constructor(private readonly options: PasswordAuthentication) {}
+  constructor(
+    private readonly options: PasswordAuthentication,
+    private readonly secrets: IsdsSecretStore = new BunSecretStore(),
+  ) {}
 
   async initialize(_context: AuthContext = {}): Promise<void> {
     if (this.options.type === "password") {
@@ -63,9 +96,9 @@ export class PasswordAuthAdapter implements IsdsAuthenticationAdapter {
       return;
     }
 
-    const service = this.options.service ?? "thinkhome-isds";
-    this.#username = await readBunSecret(service, this.options.usernameSecret) ?? undefined;
-    this.#password = await readBunSecret(service, this.options.passwordSecret) ?? undefined;
+    const service = this.options.service ?? DEFAULT_SECRET_SERVICE;
+    this.#username = await this.secrets.get({ service, name: this.options.usernameSecret }) ?? undefined;
+    this.#password = await this.secrets.get({ service, name: this.options.passwordSecret }) ?? undefined;
 
     if (!this.#username || !this.#password) {
       throw new IsdsAuthenticationError("Password authentication secrets are not available.", {
@@ -119,10 +152,13 @@ export class PasswordAuthAdapter implements IsdsAuthenticationAdapter {
   }
 }
 
-export function createAuthenticationAdapter(authentication: IsdsAuthentication): IsdsAuthenticationAdapter | undefined {
+export function createAuthenticationAdapter(
+  authentication: IsdsAuthentication,
+  options: { readonly secrets?: IsdsSecretStore } = {},
+): IsdsAuthenticationAdapter | undefined {
   if (authentication.type === "none") return undefined;
   if (authentication.type === "password" || authentication.type === "password-secret") {
-    return new PasswordAuthAdapter(authentication);
+    return new PasswordAuthAdapter(authentication, options.secrets);
   }
   throw new IsdsConfigurationError("Unsupported authentication type.", { type: (authentication as { type: string }).type });
 }

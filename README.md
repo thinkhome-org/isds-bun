@@ -26,4 +26,12 @@ const client = createIsdsClient({
 });
 ```
 
+Store profile credentials in the OS credential store through Bun:
+
+```bash
+printf '%s' 'username' | bun packages/isds/src/bin/isds.ts secret set --name company-production/username --value-stdin
+printf '%s' 'password' | bun packages/isds/src/bin/isds.ts secret set --name company-production/password --value-stdin
+bun packages/isds/src/bin/isds.ts profile secret-status --config isds.toml --profile company-production
+```
+
 Operation coverage is tracked in `docs/generated/wsdl-operation-coverage.md`.
