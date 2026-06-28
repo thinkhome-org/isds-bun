@@ -3,6 +3,8 @@
 
 import { createSoapEnvelope, soapContentType, throwIfSoapFault, type SoapVersion } from "../soap/index.ts";
 import type { BunFetchTransport } from "../transport/index.ts";
+import { GENERATED_OPERATIONS } from "./operations.generated.ts";
+import { IsdsUnsupportedOperationError } from "../errors/index.ts";
 export { GENERATED_OPERATIONS } from "./operations.generated.ts";
 
 export interface RawOperationMetadata {
@@ -26,11 +28,17 @@ export interface RawInvokeOptions {
   readonly signal?: AbortSignal;
 }
 
+export type RawEndpointResolver = URL | ((metadata: RawOperationMetadata) => URL);
+
 export class RawSoapClient {
   constructor(
     private readonly transport: BunFetchTransport,
-    private readonly endpoint: URL,
+    private readonly endpoint: RawEndpointResolver,
   ) {}
+
+  endpointFor(metadata: RawOperationMetadata): URL {
+    return this.endpoint instanceof URL ? this.endpoint : this.endpoint(metadata);
+  }
 
   async invokeXml(metadata: RawOperationMetadata, bodyXml: string, options: RawInvokeOptions = {}): Promise<string> {
     const envelope = createSoapEnvelope({ version: metadata.soapVersion, bodyXml });
@@ -39,7 +47,7 @@ export class RawSoapClient {
       headers.set("SOAPAction", metadata.soapAction);
     }
     const request = {
-      url: this.endpoint,
+      url: this.endpointFor(metadata),
       headers,
       body: envelope,
       ...(options.signal ? { signal: options.signal } : {}),
@@ -48,5 +56,13 @@ export class RawSoapClient {
     const text = await response.text();
     throwIfSoapFault(text);
     return text;
+  }
+
+  async invokeGeneratedXml(operation: string, bodyXml: string, options: RawInvokeOptions = {}): Promise<string> {
+    const metadata = GENERATED_OPERATIONS.find((item) => item.operation === operation);
+    if (!metadata) {
+      throw new IsdsUnsupportedOperationError("Unknown generated ISDS operation.", { operation });
+    }
+    return this.invokeXml(metadata, bodyXml, options);
   }
 }

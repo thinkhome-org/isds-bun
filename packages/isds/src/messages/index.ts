@@ -123,16 +123,11 @@ export class MessagesClient {
       valueElement("dmLimit", options.limit ?? 10) +
       `</GetListOfReceivedMessages>`;
 
-    const rawXml = await this.raw.invokeXml({
-      operation: "GetListOfReceivedMessages",
-      service: "dmInfoWebService",
-      binding: "dmInfoBinding",
-      endpointCategory: "messages",
-      soapVersion: "1.1",
-      soapAction: "",
-      idempotent: true,
-      sourceWsdlSha256: "unverified-local-snapshot",
-    }, bodyXml, options.signal ? { signal: options.signal } : {});
+    const rawXml = await this.raw.invokeGeneratedXml(
+      "GetListOfReceivedMessages",
+      bodyXml,
+      options.signal ? { signal: options.signal } : {},
+    );
 
     const statusCode = firstText(rawXml, "dmStatusCode") ?? "";
     const statusMessage = firstText(rawXml, "dmStatusMessage") ?? "";

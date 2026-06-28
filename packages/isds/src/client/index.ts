@@ -51,7 +51,12 @@ export function createIsdsClient(options: CreateIsdsClientOptions): IsdsClient {
     ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
     ...(options.tls === undefined ? {} : { tls: options.tls }),
   });
-  const raw = new RawSoapClient(transport, environment.endpoints.messages ?? Object.values(environment.endpoints)[0]!);
+  const raw = new RawSoapClient(transport, (metadata) => {
+    const endpoint = environment.endpoints[metadata.endpointCategory];
+    if (endpoint) return endpoint;
+    if (metadata.endpoint) return new URL(metadata.endpoint);
+    return Object.values(environment.endpoints)[0]!;
+  });
 
   let initialized = false;
   async function ensureInitialized(): Promise<void> {
