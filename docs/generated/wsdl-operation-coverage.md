@@ -6,10 +6,10 @@ Status: generated from official production WSDL/XSD artifacts.
 |---|---:|
 | WSDL operations discovered | 45 |
 | Raw methods generated | 45 |
-| High-level wrappers complete | 8 |
-| Contract fixtures | 8 |
+| High-level wrappers complete | 13 |
+| Contract fixtures | 13 |
 | Raw operation coverage | 100% |
-| High-level coverage | 18% |
+| High-level coverage | 29% |
 
 | Service | Operation | Endpoint | Raw | High-level | Fixture | Test |
 |---|---|---|---:|---:|---:|---:|
@@ -35,7 +35,7 @@ Status: generated from official production WSDL/XSD artifacts.
 | DataBoxSearch | `GetDataBoxAddress` | search | yes | no | no | no |
 | dmInfoWebService | `VerifyMessage` | messages | yes | no | no | no |
 | dmInfoWebService | `MessageEnvelopeDownload` | messages | yes | yes | yes | yes |
-| dmInfoWebService | `MarkMessageAsDownloaded` | messages | yes | no | no | no |
+| dmInfoWebService | `MarkMessageAsDownloaded` | messages | yes | yes | yes | yes |
 | dmInfoWebService | `GetDeliveryInfo` | messages | yes | yes | yes | yes |
 | dmInfoWebService | `GetSignedDeliveryInfo` | messages | yes | yes | yes | yes |
 | dmInfoWebService | `GetListOfSentMessages` | messages | yes | yes | yes | yes |
@@ -43,12 +43,12 @@ Status: generated from official production WSDL/XSD artifacts.
 | dmInfoWebService | `GetMessageStateChanges` | messages | yes | yes | yes | yes |
 | dmInfoWebService | `GetMessageAuthor` | messages | yes | yes | yes | yes |
 | dmInfoWebService | `GetMessageAuthor2` | messages | yes | yes | yes | yes |
-| dmInfoWebService | `EraseMessage` | messages | yes | no | no | no |
-| dmInfoWebService | `GetListOfErasedMessages` | messages | yes | no | no | no |
-| dmInfoWebService | `PickUpAsyncResponse` | messages | yes | no | no | no |
+| dmInfoWebService | `EraseMessage` | messages | yes | yes | yes | yes |
+| dmInfoWebService | `GetListOfErasedMessages` | messages | yes | yes | yes | yes |
+| dmInfoWebService | `PickUpAsyncResponse` | messages | yes | yes | yes | yes |
 | dmInfoWebService | `GetListForNotifications` | messages | yes | no | no | no |
 | dmInfoWebService | `RegisterForNotifications` | messages | yes | no | no | no |
-| dmInfoWebService | `SentMessageEnvelopeDownload` | messages | yes | no | no | no |
+| dmInfoWebService | `SentMessageEnvelopeDownload` | messages | yes | yes | yes | yes |
 | dmInfoWebService | `SuspMessageReport` | messages | yes | no | no | no |
 | dmOperationsWebService | `CreateMessage` | messages | yes | no | no | no |
 | dmOperationsWebService | `MessageDownload` | messages | yes | no | no | no |

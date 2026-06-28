@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 ThinkHome s.r.o.
 // SPDX-License-Identifier: MPL-2.0
 
-import { IsdsStatusError } from "../errors/index.ts";
+import { IsdsConfigurationError, IsdsStatusError } from "../errors/index.ts";
 import type { RawSoapClient } from "../raw/index.ts";
 import { escapeXmlText } from "../xml/index.ts";
 
@@ -65,6 +65,23 @@ export interface MessageEnvelopeDownloadResult {
   readonly rawXml: string;
 }
 
+export type SentMessageEnvelopeDownloadResult = MessageEnvelopeDownloadResult;
+
+export interface StatusOnlyResult {
+  readonly statusCode: string;
+  readonly statusMessage: string;
+  readonly rawXml: string;
+}
+
+export type MarkMessageAsDownloadedResult = StatusOnlyResult;
+
+export interface EraseMessageOptions {
+  readonly incoming: boolean;
+  readonly signal?: AbortSignal;
+}
+
+export type EraseMessageResult = StatusOnlyResult;
+
 export interface DeliveryEvent {
   readonly time?: string;
   readonly description?: string;
@@ -119,13 +136,43 @@ export interface MessageAuthorResult {
   readonly rawXml: string;
 }
 
+export interface GetErasedMessagesListOptions {
+  readonly fromDate?: Date | string;
+  readonly toDate?: Date | string;
+  readonly year?: number;
+  readonly month?: number;
+  readonly messageType: "SENT" | "RECEIVED";
+  readonly outputFormat?: "XML" | "CSV";
+  readonly signal?: AbortSignal;
+}
+
+export interface GetErasedMessagesListResult {
+  readonly statusCode: string;
+  readonly statusMessage: string;
+  readonly asyncId?: string;
+  readonly rawXml: string;
+}
+
+export interface PickUpAsyncResponseResult {
+  readonly statusCode: string;
+  readonly statusMessage: string;
+  readonly asyncReqType?: string;
+  readonly asyncResponse?: string;
+  readonly rawXml: string;
+}
+
 function nilElement(name: string): string {
   return `<${name} xsi:nil="true"/>`;
 }
 
-function valueElement(name: string, value: string | number | Date | null | undefined): string {
+function valueElement(name: string, value: string | number | boolean | Date | null | undefined): string {
   if (value === null || value === undefined) return nilElement(name);
   const text = value instanceof Date ? value.toISOString() : String(value);
+  return `<${name}>${escapeXmlText(text)}</${name}>`;
+}
+
+function dateElement(name: string, value: Date | string): string {
+  const text = value instanceof Date ? value.toISOString().slice(0, 10) : value;
   return `<${name}>${escapeXmlText(text)}</${name}>`;
 }
 
@@ -304,10 +351,18 @@ export class MessagesClient {
   }
 
   async downloadEnvelope(messageId: string, options: { signal?: AbortSignal } = {}): Promise<MessageEnvelopeDownloadResult> {
+    return this.downloadEnvelopeByOperation("MessageEnvelopeDownload", messageId, options);
+  }
+
+  async downloadSentEnvelope(messageId: string, options: { signal?: AbortSignal } = {}): Promise<SentMessageEnvelopeDownloadResult> {
+    return this.downloadEnvelopeByOperation("SentMessageEnvelopeDownload", messageId, options);
+  }
+
+  private async downloadEnvelopeByOperation(operation: "MessageEnvelopeDownload" | "SentMessageEnvelopeDownload", messageId: string, options: { signal?: AbortSignal }): Promise<MessageEnvelopeDownloadResult> {
     await this.ensureInitialized();
     const rawXml = await this.raw.invokeGeneratedXml(
-      "MessageEnvelopeDownload",
-      idRequest("MessageEnvelopeDownload", messageId),
+      operation,
+      idRequest(operation, messageId),
       options.signal ? { signal: options.signal } : {},
     );
     const { statusCode, statusMessage } = assertOk(rawXml);
@@ -320,6 +375,17 @@ export class MessagesClient {
       ...(envelopeBody ? { envelope: parseEnvelope(envelopeBody, attrs) } : {}),
       rawXml,
     };
+  }
+
+  async markAsDownloaded(messageId: string, options: { signal?: AbortSignal } = {}): Promise<MarkMessageAsDownloadedResult> {
+    await this.ensureInitialized();
+    const rawXml = await this.raw.invokeGeneratedXml(
+      "MarkMessageAsDownloaded",
+      idRequest("MarkMessageAsDownloaded", messageId),
+      options.signal ? { signal: options.signal } : {},
+    );
+    const { statusCode, statusMessage } = assertOk(rawXml);
+    return { statusCode, statusMessage, rawXml };
   }
 
   async getDeliveryInfo(messageId: string, options: { signal?: AbortSignal } = {}): Promise<DeliveryInfoResult> {
@@ -401,6 +467,87 @@ export class MessagesClient {
 
   async getAuthor2(messageId: string, options: { signal?: AbortSignal } = {}): Promise<MessageAuthorResult> {
     return this.getAuthorByOperation("GetMessageAuthor2", messageId, options);
+  }
+
+  async eraseMessage(messageId: string, options: EraseMessageOptions): Promise<EraseMessageResult> {
+    if (!options || typeof options.incoming !== "boolean") {
+      throw new IsdsConfigurationError("EraseMessage requires an explicit incoming flag.");
+    }
+    await this.ensureInitialized();
+    const bodyXml = `<EraseMessage xmlns="http://isds.czechpoint.cz/v20">` +
+      `<dmID>${escapeXmlText(messageId)}</dmID>` +
+      valueElement("dmIncoming", options.incoming) +
+      `</EraseMessage>`;
+    const rawXml = await this.raw.invokeGeneratedXml(
+      "EraseMessage",
+      bodyXml,
+      options.signal ? { signal: options.signal } : {},
+    );
+    const { statusCode, statusMessage } = assertOk(rawXml);
+    return { statusCode, statusMessage, rawXml };
+  }
+
+  async getErasedMessagesList(options: GetErasedMessagesListOptions): Promise<GetErasedMessagesListResult> {
+    if (!options) {
+      throw new IsdsConfigurationError("GetListOfErasedMessages options are required.");
+    }
+    if (options.messageType !== "SENT" && options.messageType !== "RECEIVED") {
+      throw new IsdsConfigurationError("GetListOfErasedMessages messageType must be SENT or RECEIVED.");
+    }
+    if (options.outputFormat !== undefined && options.outputFormat !== "XML" && options.outputFormat !== "CSV") {
+      throw new IsdsConfigurationError("GetListOfErasedMessages outputFormat must be XML or CSV.");
+    }
+    const hasRange = options.fromDate !== undefined || options.toDate !== undefined;
+    const hasYear = options.year !== undefined;
+    if ((hasRange && hasYear) || (hasRange && (!options.fromDate || !options.toDate)) || (!hasRange && !hasYear)) {
+      throw new IsdsConfigurationError("GetListOfErasedMessages requires either fromDate/toDate or year/month.");
+    }
+
+    await this.ensureInitialized();
+    const dateChoice = hasRange
+      ? dateElement("dmFromDate", options.fromDate as Date | string) + dateElement("dmToDate", options.toDate as Date | string)
+      : valueElement("dmYear", options.year) + (options.month === undefined ? "" : valueElement("dmMonth", options.month));
+    const bodyXml = `<GetListOfErasedMessages xmlns="http://isds.czechpoint.cz/v20">` +
+      dateChoice +
+      `<dmMessageType>${escapeXmlText(options.messageType)}</dmMessageType>` +
+      `<dmOutFormat>${escapeXmlText(options.outputFormat ?? "XML")}</dmOutFormat>` +
+      `</GetListOfErasedMessages>`;
+    const rawXml = await this.raw.invokeGeneratedXml(
+      "GetListOfErasedMessages",
+      bodyXml,
+      options.signal ? { signal: options.signal } : {},
+    );
+    const { statusCode, statusMessage } = assertOk(rawXml);
+    const asyncId = firstText(rawXml, "asyncID");
+    return {
+      statusCode,
+      statusMessage,
+      ...(asyncId ? { asyncId } : {}),
+      rawXml,
+    };
+  }
+
+  async pickUpAsyncResponse(asyncId: string, asyncReqType: string, options: { signal?: AbortSignal } = {}): Promise<PickUpAsyncResponseResult> {
+    await this.ensureInitialized();
+    const bodyXml = `<PickUpAsyncResponse xmlns="http://isds.czechpoint.cz/v20">` +
+      `<asyncID>${escapeXmlText(asyncId)}</asyncID>` +
+      `<asyncReqType>${escapeXmlText(asyncReqType)}</asyncReqType>` +
+      `</PickUpAsyncResponse>`;
+    const rawXml = await this.raw.invokeGeneratedXml(
+      "PickUpAsyncResponse",
+      bodyXml,
+      options.signal ? { signal: options.signal } : {},
+    );
+    const { statusCode, statusMessage } = assertOk(rawXml);
+    const returnedType = firstText(rawXml, "asyncReqType");
+    const asyncResponse = firstText(rawXml, "asyncResponse");
+    return {
+      statusCode,
+      statusMessage,
+      ...(returnedType ? { asyncReqType: returnedType } : {}),
+      ...(asyncResponse ? { asyncResponse } : {}),
+      rawXml,
+    };
   }
 
   private async getAuthorByOperation(operation: "GetMessageAuthor" | "GetMessageAuthor2", messageId: string, options: { signal?: AbortSignal }): Promise<MessageAuthorResult> {

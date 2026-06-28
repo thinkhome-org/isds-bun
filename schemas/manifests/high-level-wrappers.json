@@ -18,6 +18,18 @@
       "fixture": true,
       "test": true
     },
+    "SentMessageEnvelopeDownload": {
+      "module": "messages",
+      "method": "downloadSentEnvelope",
+      "fixture": true,
+      "test": true
+    },
+    "MarkMessageAsDownloaded": {
+      "module": "messages",
+      "method": "markAsDownloaded",
+      "fixture": true,
+      "test": true
+    },
     "GetDeliveryInfo": {
       "module": "messages",
       "method": "getDeliveryInfo",
@@ -45,6 +57,24 @@
     "GetMessageAuthor2": {
       "module": "messages",
       "method": "getAuthor2",
+      "fixture": true,
+      "test": true
+    },
+    "EraseMessage": {
+      "module": "messages",
+      "method": "eraseMessage",
+      "fixture": true,
+      "test": true
+    },
+    "GetListOfErasedMessages": {
+      "module": "messages",
+      "method": "getErasedMessagesList",
+      "fixture": true,
+      "test": true
+    },
+    "PickUpAsyncResponse": {
+      "module": "messages",
+      "method": "pickUpAsyncResponse",
       "fixture": true,
       "test": true
     }

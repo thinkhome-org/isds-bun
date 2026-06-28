@@ -13,14 +13,22 @@ export {
   type ListSentMessagesResult,
   type DeliveryEvent,
   type DeliveryInfoResult,
+  type EraseMessageOptions,
+  type EraseMessageResult,
+  type GetErasedMessagesListOptions,
+  type GetErasedMessagesListResult,
   type GetMessageStateChangesOptions,
   type GetMessageStateChangesResult,
+  type MarkMessageAsDownloadedResult,
   type MessageAuthorResult,
   type MessageEnvelopeDownloadResult,
   type MessageStateChange,
+  type PickUpAsyncResponseResult,
   type ReceivedMessageRecord,
+  type SentMessageEnvelopeDownloadResult,
   type SignedDeliveryInfoResult,
   type SentMessageRecord,
+  type StatusOnlyResult,
 } from "./messages/index.ts";
 export * from "./xml/index.ts";
 export * from "./soap/index.ts";

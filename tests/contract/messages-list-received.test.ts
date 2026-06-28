@@ -66,6 +66,40 @@ test("high-level envelope download calls raw read-only SOAP operation", async ()
   expect(result.envelope?.annotation).toBe("Envelope Test");
 });
 
+test("high-level sent envelope download calls raw read-only SOAP operation", async () => {
+  server = startMockIsdsServer({ username: "u", password: "p" });
+  const client = createIsdsClient({
+    environment: {
+      type: "custom",
+      name: "mock",
+      allowInsecureHttp: true,
+      endpoints: { messages: server.url.toString() },
+    },
+    authentication: { type: "password", username: "u", password: "p" },
+  });
+
+  const result = await client.messages.downloadSentEnvelope("654321");
+  expect(result.statusCode).toBe("0000");
+  expect(result.envelope?.id).toBe("654321");
+  expect(result.envelope?.annotation).toBe("Sent Envelope Test");
+});
+
+test("high-level mark as downloaded calls raw SOAP operation", async () => {
+  server = startMockIsdsServer({ username: "u", password: "p" });
+  const client = createIsdsClient({
+    environment: {
+      type: "custom",
+      name: "mock",
+      allowInsecureHttp: true,
+      endpoints: { messages: server.url.toString() },
+    },
+    authentication: { type: "password", username: "u", password: "p" },
+  });
+
+  const result = await client.messages.markAsDownloaded("123456");
+  expect(result.statusCode).toBe("0000");
+});
+
 test("high-level delivery info calls raw read-only SOAP operation", async () => {
   server = startMockIsdsServer({ username: "u", password: "p" });
   const client = createIsdsClient({
@@ -150,4 +184,59 @@ test("high-level message author2 calls raw read-only SOAP operation", async () =
   const result = await client.messages.getAuthor2("123456");
   expect(result.statusCode).toBe("0000");
   expect(result.authorName).toBe("Author Two");
+});
+
+test("high-level erase message calls raw SOAP operation with explicit direction", async () => {
+  server = startMockIsdsServer({ username: "u", password: "p" });
+  const client = createIsdsClient({
+    environment: {
+      type: "custom",
+      name: "mock",
+      allowInsecureHttp: true,
+      endpoints: { messages: server.url.toString() },
+    },
+    authentication: { type: "password", username: "u", password: "p" },
+  });
+
+  const result = await client.messages.eraseMessage("123456", { incoming: true });
+  expect(result.statusCode).toBe("0000");
+});
+
+test("high-level erased message list starts async raw SOAP operation", async () => {
+  server = startMockIsdsServer({ username: "u", password: "p" });
+  const client = createIsdsClient({
+    environment: {
+      type: "custom",
+      name: "mock",
+      allowInsecureHttp: true,
+      endpoints: { messages: server.url.toString() },
+    },
+    authentication: { type: "password", username: "u", password: "p" },
+  });
+
+  const result = await client.messages.getErasedMessagesList({
+    year: 2026,
+    month: 6,
+    messageType: "RECEIVED",
+  });
+  expect(result.statusCode).toBe("0000");
+  expect(result.asyncId).toBe("async-123");
+});
+
+test("high-level async pickup returns base64 payload", async () => {
+  server = startMockIsdsServer({ username: "u", password: "p" });
+  const client = createIsdsClient({
+    environment: {
+      type: "custom",
+      name: "mock",
+      allowInsecureHttp: true,
+      endpoints: { messages: server.url.toString() },
+    },
+    authentication: { type: "password", username: "u", password: "p" },
+  });
+
+  const result = await client.messages.pickUpAsyncResponse("async-123", "GetListOfErasedMessages");
+  expect(result.statusCode).toBe("0000");
+  expect(result.asyncReqType).toBe("GetListOfErasedMessages");
+  expect(result.asyncResponse).toBe("RVJBU0VE");
 });
