@@ -100,6 +100,23 @@ test("high-level mark as downloaded calls raw SOAP operation", async () => {
   expect(result.statusCode).toBe("0000");
 });
 
+test("high-level verify message returns server hash", async () => {
+  server = startMockIsdsServer({ username: "u", password: "p" });
+  const client = createIsdsClient({
+    environment: {
+      type: "custom",
+      name: "mock",
+      allowInsecureHttp: true,
+      endpoints: { messages: server.url.toString() },
+    },
+    authentication: { type: "password", username: "u", password: "p" },
+  });
+
+  const result = await client.messages.verifyMessage("123456");
+  expect(result.statusCode).toBe("0000");
+  expect(result.hash).toEqual({ value: "SEFTSA==", algorithm: "SHA-256" });
+});
+
 test("high-level delivery info calls raw read-only SOAP operation", async () => {
   server = startMockIsdsServer({ username: "u", password: "p" });
   const client = createIsdsClient({
@@ -239,4 +256,62 @@ test("high-level async pickup returns base64 payload", async () => {
   expect(result.statusCode).toBe("0000");
   expect(result.asyncReqType).toBe("GetListOfErasedMessages");
   expect(result.asyncResponse).toBe("RVJBU0VE");
+});
+
+test("high-level notification list calls raw SOAP operation", async () => {
+  server = startMockIsdsServer({ username: "u", password: "p" });
+  const client = createIsdsClient({
+    environment: {
+      type: "custom",
+      name: "mock",
+      allowInsecureHttp: true,
+      endpoints: { messages: server.url.toString() },
+    },
+    authentication: { type: "password", username: "u", password: "p" },
+  });
+
+  const result = await client.messages.getNotifications({
+    fromTime: "2026-06-28T00:00:00Z",
+    scope: "delivered",
+  });
+  expect(result.statusCode).toBe("0000");
+  expect(result.listContinues).toBe(false);
+  expect(result.records[0]?.messageId).toBe("123456");
+  expect(result.records[0]?.annotation).toBe("Notification");
+});
+
+test("high-level notification registration calls raw SOAP operation", async () => {
+  server = startMockIsdsServer({ username: "u", password: "p" });
+  const client = createIsdsClient({
+    environment: {
+      type: "custom",
+      name: "mock",
+      allowInsecureHttp: true,
+      endpoints: { messages: server.url.toString() },
+    },
+    authentication: { type: "password", username: "u", password: "p" },
+  });
+
+  const result = await client.messages.registerForNotifications({ action: 1 });
+  expect(result.statusCode).toBe("0000");
+});
+
+test("high-level suspicious message report calls raw SOAP operation", async () => {
+  server = startMockIsdsServer({ username: "u", password: "p" });
+  const client = createIsdsClient({
+    environment: {
+      type: "custom",
+      name: "mock",
+      allowInsecureHttp: true,
+      endpoints: { messages: server.url.toString() },
+    },
+    authentication: { type: "password", username: "u", password: "p" },
+  });
+
+  const result = await client.messages.reportSuspiciousMessage("123456", {
+    allowComplete: false,
+    reporterEmail: "security@example.test",
+    note: "Synthetic report",
+  });
+  expect(result.statusCode).toBe("0000");
 });

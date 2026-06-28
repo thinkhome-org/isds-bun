@@ -25,6 +25,12 @@ export function startMockIsdsServer(options: MockIsdsServerOptions = {}): Return
           { headers: { "Content-Type": "text/xml" } },
         );
       }
+      if (body.includes("VerifyMessage")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><VerifyMessageResponse xmlns="http://isds.czechpoint.cz/v20"><dmHash algorithm="SHA-256">SEFTSA==</dmHash><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></VerifyMessageResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
       if (body.includes("GetListOfReceivedMessages")) {
         return new Response(
           `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><GetListOfReceivedMessagesResponse xmlns="http://isds.czechpoint.cz/v20"><dmRecords><dmRecord dmType="V" dmVODZ="false"><dmOrdinal>1</dmOrdinal><dmID>123456</dmID><dbIDSender>abc123</dbIDSender><dmSender>Sender</dmSender><dmSenderAddress>Address</dmSenderAddress><dmSenderType>10</dmSenderType><dmRecipient>Recipient</dmRecipient><dmRecipientAddress>Recipient Address</dmRecipientAddress><dmAnnotation>Test</dmAnnotation><dmMessageStatus>4</dmMessageStatus><dmAttachmentSize>1</dmAttachmentSize><dmDeliveryTime>2026-06-28T00:00:00Z</dmDeliveryTime><dmAcceptanceTime>2026-06-28T00:00:00Z</dmAcceptanceTime></dmRecord></dmRecords><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></GetListOfReceivedMessagesResponse></soap:Body></soap:Envelope>`,
@@ -100,6 +106,24 @@ export function startMockIsdsServer(options: MockIsdsServerOptions = {}): Return
       if (body.includes("GetListOfErasedMessages")) {
         return new Response(
           `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><GetListOfErasedMessagesResponse xmlns="http://isds.czechpoint.cz/v20"><asyncID>async-123</asyncID><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></GetListOfErasedMessagesResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("GetListForNotifications")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><GetListForNotificationsResponse xmlns="http://isds.czechpoint.cz/v20"><ntfRecords><ntfRecord><ntfType>1</ntfType><dmID>123456</dmID><dmPersonalDelivery>0</dmPersonalDelivery><dmDeliveryTime>2026-06-28T00:00:00Z</dmDeliveryTime><dbIDRecipient>rcpt01</dbIDRecipient><dmAnnotation>Notification</dmAnnotation><dbIDSender>sndr01</dbIDSender><dmSender>Sender</dmSender></ntfRecord></ntfRecords><ntfListContinues>false</ntfListContinues><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></GetListForNotificationsResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("RegisterForNotifications")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><RegisterForNotificationsResponse xmlns="http://isds.czechpoint.cz/v20"><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></RegisterForNotificationsResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("SuspMessageReport")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><SuspMessageReportResponse xmlns="http://isds.czechpoint.cz/v20"><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></SuspMessageReportResponse></soap:Body></soap:Envelope>`,
           { headers: { "Content-Type": "text/xml" } },
         );
       }

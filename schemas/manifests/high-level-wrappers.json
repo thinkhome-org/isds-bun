@@ -1,5 +1,11 @@
 {
   "operations": {
+    "VerifyMessage": {
+      "module": "messages",
+      "method": "verifyMessage",
+      "fixture": true,
+      "test": true
+    },
     "GetListOfReceivedMessages": {
       "module": "messages",
       "method": "listReceived",
@@ -75,6 +81,24 @@
     "PickUpAsyncResponse": {
       "module": "messages",
       "method": "pickUpAsyncResponse",
+      "fixture": true,
+      "test": true
+    },
+    "GetListForNotifications": {
+      "module": "messages",
+      "method": "getNotifications",
+      "fixture": true,
+      "test": true
+    },
+    "RegisterForNotifications": {
+      "module": "messages",
+      "method": "registerForNotifications",
+      "fixture": true,
+      "test": true
+    },
+    "SuspMessageReport": {
+      "module": "messages",
+      "method": "reportSuspiciousMessage",
       "fixture": true,
       "test": true
     }

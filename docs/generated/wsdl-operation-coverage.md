@@ -6,10 +6,10 @@ Status: generated from official production WSDL/XSD artifacts.
 |---|---:|
 | WSDL operations discovered | 45 |
 | Raw methods generated | 45 |
-| High-level wrappers complete | 13 |
-| Contract fixtures | 13 |
+| High-level wrappers complete | 17 |
+| Contract fixtures | 17 |
 | Raw operation coverage | 100% |
-| High-level coverage | 29% |
+| High-level coverage | 38% |
 
 | Service | Operation | Endpoint | Raw | High-level | Fixture | Test |
 |---|---|---|---:|---:|---:|---:|
@@ -33,7 +33,7 @@ Status: generated from official production WSDL/XSD artifacts.
 | DataBoxSearch | `PDZSendInfo` | search | yes | no | no | no |
 | DataBoxSearch | `GetConstants` | search | yes | no | no | no |
 | DataBoxSearch | `GetDataBoxAddress` | search | yes | no | no | no |
-| dmInfoWebService | `VerifyMessage` | messages | yes | no | no | no |
+| dmInfoWebService | `VerifyMessage` | messages | yes | yes | yes | yes |
 | dmInfoWebService | `MessageEnvelopeDownload` | messages | yes | yes | yes | yes |
 | dmInfoWebService | `MarkMessageAsDownloaded` | messages | yes | yes | yes | yes |
 | dmInfoWebService | `GetDeliveryInfo` | messages | yes | yes | yes | yes |
@@ -46,10 +46,10 @@ Status: generated from official production WSDL/XSD artifacts.
 | dmInfoWebService | `EraseMessage` | messages | yes | yes | yes | yes |
 | dmInfoWebService | `GetListOfErasedMessages` | messages | yes | yes | yes | yes |
 | dmInfoWebService | `PickUpAsyncResponse` | messages | yes | yes | yes | yes |
-| dmInfoWebService | `GetListForNotifications` | messages | yes | no | no | no |
-| dmInfoWebService | `RegisterForNotifications` | messages | yes | no | no | no |
+| dmInfoWebService | `GetListForNotifications` | messages | yes | yes | yes | yes |
+| dmInfoWebService | `RegisterForNotifications` | messages | yes | yes | yes | yes |
 | dmInfoWebService | `SentMessageEnvelopeDownload` | messages | yes | yes | yes | yes |
-| dmInfoWebService | `SuspMessageReport` | messages | yes | no | no | no |
+| dmInfoWebService | `SuspMessageReport` | messages | yes | yes | yes | yes |
 | dmOperationsWebService | `CreateMessage` | messages | yes | no | no | no |
 | dmOperationsWebService | `MessageDownload` | messages | yes | no | no | no |
 | dmOperationsWebService | `SignedMessageDownload` | messages | yes | no | no | no |

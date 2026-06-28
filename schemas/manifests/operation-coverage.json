@@ -3,11 +3,11 @@
   "source": "official-datovka-v20",
   "operationsDiscovered": 45,
   "rawMethodsGenerated": 45,
-  "highLevelWrappersComplete": 13,
-  "contractFixtures": 13,
+  "highLevelWrappersComplete": 17,
+  "contractFixtures": 17,
   "coveragePercent": 100,
   "rawCoveragePercent": 100,
-  "highLevelCoveragePercent": 29,
+  "highLevelCoveragePercent": 38,
   "operations": [
     {
       "operation": "GetOwnerInfoFromLogin",
@@ -383,9 +383,9 @@
       "responseMessage": "MessageVerifyResponse",
       "sourceWsdl": "dm_info.wsdl",
       "sourceWsdlSha256": "b82c99e6cfbd80bdbdb20825cfdfba0a47d0894c4369a7f6708115984db8b5ac",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "MessageEnvelopeDownload",
@@ -617,9 +617,9 @@
       "responseMessage": "GetListForNotificationsResponse",
       "sourceWsdl": "dm_info.wsdl",
       "sourceWsdlSha256": "b82c99e6cfbd80bdbdb20825cfdfba0a47d0894c4369a7f6708115984db8b5ac",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "RegisterForNotifications",
@@ -635,9 +635,9 @@
       "responseMessage": "RegisterForNotificationsResponse",
       "sourceWsdl": "dm_info.wsdl",
       "sourceWsdlSha256": "b82c99e6cfbd80bdbdb20825cfdfba0a47d0894c4369a7f6708115984db8b5ac",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "SentMessageEnvelopeDownload",
@@ -671,9 +671,9 @@
       "responseMessage": "SuspMessageReportResponse",
       "sourceWsdl": "dm_info.wsdl",
       "sourceWsdlSha256": "b82c99e6cfbd80bdbdb20825cfdfba0a47d0894c4369a7f6708115984db8b5ac",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "CreateMessage",

@@ -82,6 +82,18 @@ export interface EraseMessageOptions {
 
 export type EraseMessageResult = StatusOnlyResult;
 
+export interface MessageHash {
+  readonly value: string;
+  readonly algorithm?: string;
+}
+
+export interface VerifyMessageResult {
+  readonly statusCode: string;
+  readonly statusMessage: string;
+  readonly hash?: MessageHash;
+  readonly rawXml: string;
+}
+
 export interface DeliveryEvent {
   readonly time?: string;
   readonly description?: string;
@@ -161,6 +173,49 @@ export interface PickUpAsyncResponseResult {
   readonly rawXml: string;
 }
 
+export interface NotificationRecord {
+  readonly type?: number;
+  readonly messageId?: string;
+  readonly personalDelivery?: number;
+  readonly deliveryTime?: string;
+  readonly recipientBoxId?: string;
+  readonly annotation?: string;
+  readonly senderBoxId?: string;
+  readonly sender?: string;
+}
+
+export interface GetNotificationsOptions {
+  readonly fromTime: Date | string;
+  readonly scope: string;
+  readonly signal?: AbortSignal;
+}
+
+export interface GetNotificationsResult {
+  readonly statusCode: string;
+  readonly statusMessage: string;
+  readonly records: readonly NotificationRecord[];
+  readonly listContinues?: boolean;
+  readonly rawXml: string;
+}
+
+export interface RegisterForNotificationsOptions {
+  readonly action: number;
+  readonly signal?: AbortSignal;
+}
+
+export type RegisterForNotificationsResult = StatusOnlyResult;
+
+export interface ReportSuspiciousMessageOptions {
+  readonly reporterName?: string;
+  readonly reporterEmail?: string;
+  readonly reporterPhone?: string;
+  readonly allowComplete: boolean;
+  readonly note?: string;
+  readonly signal?: AbortSignal;
+}
+
+export type ReportSuspiciousMessageResult = StatusOnlyResult;
+
 function nilElement(name: string): string {
   return `<${name} xsi:nil="true"/>`;
 }
@@ -191,6 +246,13 @@ function numberFrom(xml: string, name: string): number | undefined {
   if (!text) return undefined;
   const value = Number(text);
   return Number.isFinite(value) ? value : undefined;
+}
+
+function booleanFrom(xml: string, name: string): boolean | undefined {
+  const text = firstText(xml, name);
+  if (text === "true" || text === "1") return true;
+  if (text === "false" || text === "0") return false;
+  return undefined;
 }
 
 function attr(xml: string, name: string): string | undefined {
@@ -271,6 +333,39 @@ function parseStateChanges(xml: string): MessageStateChange[] {
     if (id && eventTime && messageStatus !== undefined) {
       records.push({ id, eventTime, messageStatus });
     }
+  }
+  return records;
+}
+
+function parseHash(xml: string): MessageHash | undefined {
+  const match = /<((?:[\w.-]+:)?dmHash)([^>]*)>([\s\S]*?)<\/\1>/.exec(xml);
+  if (!match?.[3]) return undefined;
+  const algorithm = attr(match[2] ?? "", "algorithm");
+  return {
+    value: firstText(xml, "dmHash") ?? match[3],
+    ...(algorithm ? { algorithm } : {}),
+  };
+}
+
+function parseNotificationRecords(xml: string): NotificationRecord[] {
+  const records: NotificationRecord[] = [];
+  for (const match of xml.matchAll(/<((?:[\w.-]+:)?ntfRecord)(?:\s[^>]*)?>([\s\S]*?)<\/\1>/g)) {
+    const body = match[2] ?? "";
+    const record: Record<string, unknown> = {};
+    const fields = {
+      type: numberFrom(body, "ntfType"),
+      messageId: firstText(body, "dmID"),
+      personalDelivery: numberFrom(body, "dmPersonalDelivery"),
+      deliveryTime: firstText(body, "dmDeliveryTime"),
+      recipientBoxId: firstText(body, "dbIDRecipient"),
+      annotation: firstText(body, "dmAnnotation"),
+      senderBoxId: firstText(body, "dbIDSender"),
+      sender: firstText(body, "dmSender"),
+    };
+    for (const [key, value] of Object.entries(fields)) {
+      if (value !== undefined) record[key] = value;
+    }
+    records.push(record as NotificationRecord);
   }
   return records;
 }
@@ -386,6 +481,23 @@ export class MessagesClient {
     );
     const { statusCode, statusMessage } = assertOk(rawXml);
     return { statusCode, statusMessage, rawXml };
+  }
+
+  async verifyMessage(messageId: string, options: { signal?: AbortSignal } = {}): Promise<VerifyMessageResult> {
+    await this.ensureInitialized();
+    const rawXml = await this.raw.invokeGeneratedXml(
+      "VerifyMessage",
+      idRequest("VerifyMessage", messageId),
+      options.signal ? { signal: options.signal } : {},
+    );
+    const { statusCode, statusMessage } = assertOk(rawXml);
+    const hash = parseHash(rawXml);
+    return {
+      statusCode,
+      statusMessage,
+      ...(hash ? { hash } : {}),
+      rawXml,
+    };
   }
 
   async getDeliveryInfo(messageId: string, options: { signal?: AbortSignal } = {}): Promise<DeliveryInfoResult> {
@@ -548,6 +660,74 @@ export class MessagesClient {
       ...(asyncResponse ? { asyncResponse } : {}),
       rawXml,
     };
+  }
+
+  async getNotifications(options: GetNotificationsOptions): Promise<GetNotificationsResult> {
+    if (!options?.fromTime) {
+      throw new IsdsConfigurationError("GetListForNotifications requires fromTime.");
+    }
+    if (!options.scope) {
+      throw new IsdsConfigurationError("GetListForNotifications requires scope.");
+    }
+    await this.ensureInitialized();
+    const fromTime = options.fromTime instanceof Date ? options.fromTime.toISOString() : options.fromTime;
+    const bodyXml = `<GetListForNotifications xmlns="http://isds.czechpoint.cz/v20">` +
+      `<ntfFromTime>${escapeXmlText(fromTime)}</ntfFromTime>` +
+      `<ntfScope>${escapeXmlText(options.scope)}</ntfScope>` +
+      `</GetListForNotifications>`;
+    const rawXml = await this.raw.invokeGeneratedXml(
+      "GetListForNotifications",
+      bodyXml,
+      options.signal ? { signal: options.signal } : {},
+    );
+    const { statusCode, statusMessage } = assertOk(rawXml);
+    const listContinues = booleanFrom(rawXml, "ntfListContinues");
+    return {
+      statusCode,
+      statusMessage,
+      records: parseNotificationRecords(rawXml),
+      ...(listContinues !== undefined ? { listContinues } : {}),
+      rawXml,
+    };
+  }
+
+  async registerForNotifications(options: RegisterForNotificationsOptions): Promise<RegisterForNotificationsResult> {
+    if (!Number.isInteger(options?.action)) {
+      throw new IsdsConfigurationError("RegisterForNotifications requires an integer action.");
+    }
+    await this.ensureInitialized();
+    const bodyXml = `<RegisterForNotifications xmlns="http://isds.czechpoint.cz/v20">` +
+      valueElement("action", options.action) +
+      `</RegisterForNotifications>`;
+    const rawXml = await this.raw.invokeGeneratedXml(
+      "RegisterForNotifications",
+      bodyXml,
+      options.signal ? { signal: options.signal } : {},
+    );
+    const { statusCode, statusMessage } = assertOk(rawXml);
+    return { statusCode, statusMessage, rawXml };
+  }
+
+  async reportSuspiciousMessage(messageId: string, options: ReportSuspiciousMessageOptions): Promise<ReportSuspiciousMessageResult> {
+    if (!options || typeof options.allowComplete !== "boolean") {
+      throw new IsdsConfigurationError("SuspMessageReport requires an explicit allowComplete flag.");
+    }
+    await this.ensureInitialized();
+    const bodyXml = `<SuspMessageReport xmlns="http://isds.czechpoint.cz/v20">` +
+      `<dmID>${escapeXmlText(messageId)}</dmID>` +
+      (options.reporterName === undefined ? "" : valueElement("repName", options.reporterName)) +
+      (options.reporterEmail === undefined ? "" : valueElement("repMail", options.reporterEmail)) +
+      (options.reporterPhone === undefined ? "" : valueElement("repTel", options.reporterPhone)) +
+      valueElement("allowComplete", options.allowComplete) +
+      (options.note === undefined ? "" : valueElement("note", options.note)) +
+      `</SuspMessageReport>`;
+    const rawXml = await this.raw.invokeGeneratedXml(
+      "SuspMessageReport",
+      bodyXml,
+      options.signal ? { signal: options.signal } : {},
+    );
+    const { statusCode, statusMessage } = assertOk(rawXml);
+    return { statusCode, statusMessage, rawXml };
   }
 
   private async getAuthorByOperation(operation: "GetMessageAuthor" | "GetMessageAuthor2", messageId: string, options: { signal?: AbortSignal }): Promise<MessageAuthorResult> {
