@@ -3,8 +3,8 @@
 
 if (Bun.argv.includes("--check")) {
   const coverage = await Bun.file("schemas/manifests/operation-coverage.json").json();
-  if (coverage.coveragePercent !== 100) {
-    throw new Error("Release blocked until WSDL operation coverage is 100%.");
+  if (coverage.rawCoveragePercent !== 100 || coverage.highLevelCoveragePercent !== 100) {
+    throw new Error("Release blocked until raw and high-level WSDL operation coverage are 100%.");
   }
 }
 

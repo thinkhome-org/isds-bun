@@ -5,9 +5,9 @@ const manifest = await Bun.file("schemas/manifests/operation-coverage.json").jso
 if (typeof manifest.coveragePercent !== "number") {
   throw new Error("Invalid operation coverage manifest.");
 }
-if (manifest.coveragePercent !== 0 && manifest.coveragePercent !== 100) {
-  throw new Error(`Partial operation coverage is not releasable: ${manifest.coveragePercent}%`);
+if (manifest.operationsDiscovered > 0 && manifest.rawCoveragePercent !== 100) {
+  throw new Error(`Generated raw coverage must be 100%, got ${manifest.rawCoveragePercent}%`);
 }
-console.log(`Operation coverage gate: ${manifest.coveragePercent}%`);
+console.log(`Operation coverage gate: raw ${manifest.rawCoveragePercent ?? manifest.coveragePercent}%, high-level ${manifest.highLevelCoveragePercent ?? 0}%`);
 
 export {};

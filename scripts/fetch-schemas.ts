@@ -3,19 +3,23 @@
 
 import { sha256Hex } from "../packages/isds/src/crypto/index.ts";
 
-const configuredUrls = (Bun.env.ISDS_SCHEMA_URLS ?? "")
+const DEFAULT_SCHEMA_URLS = [
+  "https://www.datovka.gov.cz/static/wsdl/v20/dm_info.wsdl",
+  "https://www.datovka.gov.cz/static/wsdl/v20/dm_operations.wsdl",
+  "https://www.datovka.gov.cz/static/wsdl/v20/db_search.wsdl",
+  "https://www.datovka.gov.cz/static/wsdl/v20/db_access.wsdl",
+  "https://www.datovka.gov.cz/static/wsdl/v20/dmBaseTypes.xsd",
+  "https://www.datovka.gov.cz/static/wsdl/v20/dbTypes.xsd",
+] as const;
+
+const configuredUrls = (Bun.env.ISDS_SCHEMA_URLS ?? DEFAULT_SCHEMA_URLS.join(","))
   .split(",")
   .map((url) => url.trim())
   .filter(Boolean);
 
-if (configuredUrls.length === 0) {
-  console.log("No ISDS_SCHEMA_URLS configured. Skipping schema download.");
-  console.log("Set comma-separated official WSDL/XSD URLs before claiming operation coverage.");
-  process.exit(0);
-}
-
 await Bun.write("schemas/manifests/source-urls.txt", `${configuredUrls.join("\n")}\n`);
 
+const files = [];
 for (const rawUrl of configuredUrls) {
   const url = new URL(rawUrl);
   const response = await fetch(url);
@@ -24,7 +28,23 @@ for (const rawUrl of configuredUrls) {
   const digest = await sha256Hex(bytes);
   const name = url.pathname.split("/").filter(Boolean).at(-1) ?? `${digest}.xml`;
   await Bun.write(`schemas/production/${name}`, bytes);
+  files.push({
+    path: `schemas/production/${name}`,
+    sha256: digest,
+    contentType: response.headers.get("content-type") ?? undefined,
+    etag: response.headers.get("etag") ?? undefined,
+    lastModified: response.headers.get("last-modified") ?? undefined,
+  });
   console.log(`${name} ${digest}`);
 }
+
+await Bun.write("schemas/manifests/production-bundle.json", JSON.stringify({
+  environment: "production",
+  declaredVersion: "3.11",
+  retrievedAt: new Date().toISOString(),
+  sourceUrls: configuredUrls,
+  files,
+  manuals: [],
+}, null, 2) + "\n");
 
 export {};

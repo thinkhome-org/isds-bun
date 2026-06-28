@@ -1,0 +1,6 @@
+https://www.datovka.gov.cz/static/wsdl/v20/dm_info.wsdl
+https://www.datovka.gov.cz/static/wsdl/v20/dm_operations.wsdl
+https://www.datovka.gov.cz/static/wsdl/v20/db_search.wsdl
+https://www.datovka.gov.cz/static/wsdl/v20/db_access.wsdl
+https://www.datovka.gov.cz/static/wsdl/v20/dmBaseTypes.xsd
+https://www.datovka.gov.cz/static/wsdl/v20/dbTypes.xsd

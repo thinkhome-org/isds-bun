@@ -1,0 +1,56 @@
+{
+  "environment": "production",
+  "declaredVersion": "3.11",
+  "retrievedAt": "2026-06-28T22:14:42.124Z",
+  "sourceUrls": [
+    "https://www.datovka.gov.cz/static/wsdl/v20/dm_info.wsdl",
+    "https://www.datovka.gov.cz/static/wsdl/v20/dm_operations.wsdl",
+    "https://www.datovka.gov.cz/static/wsdl/v20/db_search.wsdl",
+    "https://www.datovka.gov.cz/static/wsdl/v20/db_access.wsdl",
+    "https://www.datovka.gov.cz/static/wsdl/v20/dmBaseTypes.xsd",
+    "https://www.datovka.gov.cz/static/wsdl/v20/dbTypes.xsd"
+  ],
+  "files": [
+    {
+      "path": "schemas/production/dm_info.wsdl",
+      "sha256": "b82c99e6cfbd80bdbdb20825cfdfba0a47d0894c4369a7f6708115984db8b5ac",
+      "contentType": "application/x-wsdl",
+      "etag": "\"4225-6546d5f75fb80\"",
+      "lastModified": "Wed, 17 Jun 2026 06:43:10 GMT"
+    },
+    {
+      "path": "schemas/production/dm_operations.wsdl",
+      "sha256": "80c3ed286c5c2775be8db64813c41ec54509b94d3839132192b03a65589bf905",
+      "contentType": "application/x-wsdl",
+      "etag": "\"2499-6546d5f75fb80\"",
+      "lastModified": "Wed, 17 Jun 2026 06:43:10 GMT"
+    },
+    {
+      "path": "schemas/production/db_search.wsdl",
+      "sha256": "e4540467025adbdf097803e741dc604eaef24fdf26ce7d38e4f5f590b2f53670",
+      "contentType": "application/x-wsdl",
+      "etag": "\"30c2-6546d5f75fb80\"",
+      "lastModified": "Wed, 17 Jun 2026 06:43:10 GMT"
+    },
+    {
+      "path": "schemas/production/db_access.wsdl",
+      "sha256": "c655b2e1cbe6b4f81ac707f9fac555fe056d2e91a81de71e305e320de99569ea",
+      "contentType": "application/x-wsdl",
+      "etag": "\"1bdd-6546d5f75fb80\"",
+      "lastModified": "Wed, 17 Jun 2026 06:43:10 GMT"
+    },
+    {
+      "path": "schemas/production/dmBaseTypes.xsd",
+      "sha256": "780ec788bf88042d888838d12f18da9ce643e5a3caa95e4b4517514bc7abc5ea",
+      "etag": "\"145b3-6546d5f75fb80\"",
+      "lastModified": "Wed, 17 Jun 2026 06:43:10 GMT"
+    },
+    {
+      "path": "schemas/production/dbTypes.xsd",
+      "sha256": "547c3b2183e13436200c10902430b364da8be38b26e31e9c455bbf6f994bd8f1",
+      "etag": "\"17feb-6546d5f75fb80\"",
+      "lastModified": "Wed, 17 Jun 2026 06:43:10 GMT"
+    }
+  ],
+  "manuals": []
+}

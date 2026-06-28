@@ -3,6 +3,7 @@
 
 import { createSoapEnvelope, soapContentType, throwIfSoapFault, type SoapVersion } from "../soap/index.ts";
 import type { BunFetchTransport } from "../transport/index.ts";
+export { GENERATED_OPERATIONS } from "./operations.generated.ts";
 
 export interface RawOperationMetadata {
   readonly operation: string;
@@ -10,9 +11,13 @@ export interface RawOperationMetadata {
   readonly port?: string;
   readonly binding?: string;
   readonly endpointCategory: string;
+  readonly endpoint?: string;
   readonly soapAction?: string;
   readonly soapVersion: SoapVersion;
   readonly idempotent: boolean;
+  readonly requestMessage?: string;
+  readonly responseMessage?: string;
+  readonly sourceWsdl?: string;
   readonly deprecated?: boolean;
   readonly sourceWsdlSha256?: string;
 }
@@ -45,5 +50,3 @@ export class RawSoapClient {
     return text;
   }
 }
-
-export const GENERATED_OPERATIONS: readonly RawOperationMetadata[] = [];
