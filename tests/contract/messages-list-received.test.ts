@@ -100,3 +100,54 @@ test("high-level signed delivery info calls raw read-only SOAP operation", async
   expect(result.statusCode).toBe("0000");
   expect(result.signature).toBe("U0lHTkFUVVJF");
 });
+
+test("high-level state changes calls raw read-only SOAP operation", async () => {
+  server = startMockIsdsServer({ username: "u", password: "p" });
+  const client = createIsdsClient({
+    environment: {
+      type: "custom",
+      name: "mock",
+      allowInsecureHttp: true,
+      endpoints: { messages: server.url.toString() },
+    },
+    authentication: { type: "password", username: "u", password: "p" },
+  });
+
+  const result = await client.messages.getStateChanges();
+  expect(result.statusCode).toBe("0000");
+  expect(result.records).toEqual([{ id: "123456", eventTime: "2026-06-28T00:00:00Z", messageStatus: 4 }]);
+});
+
+test("high-level message author calls raw read-only SOAP operation", async () => {
+  server = startMockIsdsServer({ username: "u", password: "p" });
+  const client = createIsdsClient({
+    environment: {
+      type: "custom",
+      name: "mock",
+      allowInsecureHttp: true,
+      endpoints: { messages: server.url.toString() },
+    },
+    authentication: { type: "password", username: "u", password: "p" },
+  });
+
+  const result = await client.messages.getAuthor("123456");
+  expect(result.statusCode).toBe("0000");
+  expect(result.authorName).toBe("Author One");
+});
+
+test("high-level message author2 calls raw read-only SOAP operation", async () => {
+  server = startMockIsdsServer({ username: "u", password: "p" });
+  const client = createIsdsClient({
+    environment: {
+      type: "custom",
+      name: "mock",
+      allowInsecureHttp: true,
+      endpoints: { messages: server.url.toString() },
+    },
+    authentication: { type: "password", username: "u", password: "p" },
+  });
+
+  const result = await client.messages.getAuthor2("123456");
+  expect(result.statusCode).toBe("0000");
+  expect(result.authorName).toBe("Author Two");
+});

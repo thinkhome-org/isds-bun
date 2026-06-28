@@ -29,6 +29,24 @@
       "method": "getSignedDeliveryInfo",
       "fixture": true,
       "test": true
+    },
+    "GetMessageStateChanges": {
+      "module": "messages",
+      "method": "getStateChanges",
+      "fixture": true,
+      "test": true
+    },
+    "GetMessageAuthor": {
+      "module": "messages",
+      "method": "getAuthor",
+      "fixture": true,
+      "test": true
+    },
+    "GetMessageAuthor2": {
+      "module": "messages",
+      "method": "getAuthor2",
+      "fixture": true,
+      "test": true
     }
   }
 }

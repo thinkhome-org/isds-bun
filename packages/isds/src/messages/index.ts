@@ -92,6 +92,33 @@ export interface SignedDeliveryInfoResult {
   readonly rawXml: string;
 }
 
+export interface MessageStateChange {
+  readonly id: string;
+  readonly eventTime: string;
+  readonly messageStatus: number;
+}
+
+export interface GetMessageStateChangesOptions {
+  readonly fromTime?: Date;
+  readonly toTime?: Date;
+  readonly signal?: AbortSignal;
+}
+
+export interface GetMessageStateChangesResult {
+  readonly statusCode: string;
+  readonly statusMessage: string;
+  readonly records: readonly MessageStateChange[];
+  readonly rawXml: string;
+}
+
+export interface MessageAuthorResult {
+  readonly statusCode: string;
+  readonly statusMessage: string;
+  readonly userType?: string;
+  readonly authorName?: string;
+  readonly rawXml: string;
+}
+
 function nilElement(name: string): string {
   return `<${name} xsi:nil="true"/>`;
 }
@@ -185,6 +212,20 @@ function parseEvents(xml: string): DeliveryEvent[] {
     events.push(event as DeliveryEvent);
   }
   return events;
+}
+
+function parseStateChanges(xml: string): MessageStateChange[] {
+  const records: MessageStateChange[] = [];
+  for (const match of xml.matchAll(/<((?:[\w.-]+:)?dmRecord)(?:\s[^>]*)?>([\s\S]*?)<\/\1>/g)) {
+    const body = match[2] ?? "";
+    const id = firstText(body, "dmID");
+    const eventTime = firstText(body, "dmEventTime");
+    const messageStatus = numberFrom(body, "dmMessageStatus");
+    if (id && eventTime && messageStatus !== undefined) {
+      records.push({ id, eventTime, messageStatus });
+    }
+  }
+  return records;
 }
 
 function statusFrom(rawXml: string): { statusCode: string; statusMessage: string } {
@@ -329,6 +370,54 @@ export class MessagesClient {
       statusCode,
       statusMessage,
       ...(signature ? { signature } : {}),
+      rawXml,
+    };
+  }
+
+  async getStateChanges(options: GetMessageStateChangesOptions = {}): Promise<GetMessageStateChangesResult> {
+    await this.ensureInitialized();
+    const bodyXml = `<GetMessageStateChanges xmlns="http://isds.czechpoint.cz/v20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">` +
+      valueElement("dmFromTime", options.fromTime) +
+      valueElement("dmToTime", options.toTime) +
+      `</GetMessageStateChanges>`;
+
+    const rawXml = await this.raw.invokeGeneratedXml(
+      "GetMessageStateChanges",
+      bodyXml,
+      options.signal ? { signal: options.signal } : {},
+    );
+    const { statusCode, statusMessage } = assertOk(rawXml);
+    return {
+      statusCode,
+      statusMessage,
+      records: parseStateChanges(rawXml),
+      rawXml,
+    };
+  }
+
+  async getAuthor(messageId: string, options: { signal?: AbortSignal } = {}): Promise<MessageAuthorResult> {
+    return this.getAuthorByOperation("GetMessageAuthor", messageId, options);
+  }
+
+  async getAuthor2(messageId: string, options: { signal?: AbortSignal } = {}): Promise<MessageAuthorResult> {
+    return this.getAuthorByOperation("GetMessageAuthor2", messageId, options);
+  }
+
+  private async getAuthorByOperation(operation: "GetMessageAuthor" | "GetMessageAuthor2", messageId: string, options: { signal?: AbortSignal }): Promise<MessageAuthorResult> {
+    await this.ensureInitialized();
+    const rawXml = await this.raw.invokeGeneratedXml(
+      operation,
+      idRequest(operation, messageId),
+      options.signal ? { signal: options.signal } : {},
+    );
+    const { statusCode, statusMessage } = assertOk(rawXml);
+    const userType = firstText(rawXml, "userType");
+    const authorName = firstText(rawXml, "authorName");
+    return {
+      statusCode,
+      statusMessage,
+      ...(userType ? { userType } : {}),
+      ...(authorName ? { authorName } : {}),
       rawXml,
     };
   }

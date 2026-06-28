@@ -55,6 +55,24 @@ export function startMockIsdsServer(options: MockIsdsServerOptions = {}): Return
           { headers: { "Content-Type": "text/xml" } },
         );
       }
+      if (body.includes("GetMessageStateChanges")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><GetMessageStateChangesResponse xmlns="http://isds.czechpoint.cz/v20"><dmRecords><dmRecord><dmID>123456</dmID><dmEventTime>2026-06-28T00:00:00Z</dmEventTime><dmMessageStatus>4</dmMessageStatus></dmRecord></dmRecords><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></GetMessageStateChangesResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("GetMessageAuthor2")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><GetMessageAuthor2Response xmlns="http://isds.czechpoint.cz/v20"><userType>PRIMARY</userType><authorName>Author Two</authorName><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></GetMessageAuthor2Response></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("GetMessageAuthor")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><GetMessageAuthorResponse xmlns="http://isds.czechpoint.cz/v20"><userType>PRIMARY</userType><authorName>Author One</authorName><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></GetMessageAuthorResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
       return new Response(
         `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><mock:Ok xmlns:mock="urn:thinkhome:isds:mock">ok</mock:Ok></soap:Body></soap:Envelope>`,
         { headers: { "Content-Type": "text/xml" } },

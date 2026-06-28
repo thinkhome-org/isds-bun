@@ -6,10 +6,10 @@ Status: generated from official production WSDL/XSD artifacts.
 |---|---:|
 | WSDL operations discovered | 45 |
 | Raw methods generated | 45 |
-| High-level wrappers complete | 5 |
-| Contract fixtures | 5 |
+| High-level wrappers complete | 8 |
+| Contract fixtures | 8 |
 | Raw operation coverage | 100% |
-| High-level coverage | 11% |
+| High-level coverage | 18% |
 
 | Service | Operation | Endpoint | Raw | High-level | Fixture | Test |
 |---|---|---|---:|---:|---:|---:|
@@ -40,9 +40,9 @@ Status: generated from official production WSDL/XSD artifacts.
 | dmInfoWebService | `GetSignedDeliveryInfo` | messages | yes | yes | yes | yes |
 | dmInfoWebService | `GetListOfSentMessages` | messages | yes | yes | yes | yes |
 | dmInfoWebService | `GetListOfReceivedMessages` | messages | yes | yes | yes | yes |
-| dmInfoWebService | `GetMessageStateChanges` | messages | yes | no | no | no |
-| dmInfoWebService | `GetMessageAuthor` | messages | yes | no | no | no |
-| dmInfoWebService | `GetMessageAuthor2` | messages | yes | no | no | no |
+| dmInfoWebService | `GetMessageStateChanges` | messages | yes | yes | yes | yes |
+| dmInfoWebService | `GetMessageAuthor` | messages | yes | yes | yes | yes |
+| dmInfoWebService | `GetMessageAuthor2` | messages | yes | yes | yes | yes |
 | dmInfoWebService | `EraseMessage` | messages | yes | no | no | no |
 | dmInfoWebService | `GetListOfErasedMessages` | messages | yes | no | no | no |
 | dmInfoWebService | `PickUpAsyncResponse` | messages | yes | no | no | no |
