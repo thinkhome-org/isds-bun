@@ -29,3 +29,21 @@ test("high-level received list calls raw read-only SOAP operation", async () => 
   expect(result.records).toHaveLength(1);
   expect(result.records[0]?.id).toBe("123456");
 });
+
+test("high-level sent list calls raw read-only SOAP operation", async () => {
+  server = startMockIsdsServer({ username: "u", password: "p" });
+  const client = createIsdsClient({
+    environment: {
+      type: "custom",
+      name: "mock",
+      allowInsecureHttp: true,
+      endpoints: { messages: server.url.toString() },
+    },
+    authentication: { type: "password", username: "u", password: "p" },
+  });
+
+  const result = await client.messages.listSent({ limit: 1 });
+  expect(result.statusCode).toBe("0000");
+  expect(result.records).toHaveLength(1);
+  expect(result.records[0]?.id).toBe("654321");
+});

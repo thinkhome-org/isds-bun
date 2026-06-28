@@ -5,7 +5,15 @@ export { createIsdsClient, type CreateIsdsClientOptions, type IsdsClient } from 
 export { resolveEnvironment, type IsdsEnvironment, type IsdsEndpointMap } from "./config/environment.ts";
 export { type IsdsAuthentication, PasswordAuthAdapter } from "./auth/index.ts";
 export { type IsdsCapabilities } from "./capabilities/index.ts";
-export { MessagesClient, type ListReceivedMessagesOptions, type ListReceivedMessagesResult, type ReceivedMessageRecord } from "./messages/index.ts";
+export {
+  MessagesClient,
+  type ListReceivedMessagesOptions,
+  type ListReceivedMessagesResult,
+  type ListSentMessagesOptions,
+  type ListSentMessagesResult,
+  type ReceivedMessageRecord,
+  type SentMessageRecord,
+} from "./messages/index.ts";
 export * from "./xml/index.ts";
 export * from "./soap/index.ts";
 export * from "./mtom/index.ts";

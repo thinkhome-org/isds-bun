@@ -8,7 +8,7 @@ export async function runCli(args: readonly string[] = Bun.argv.slice(2)): Promi
   const [command, subcommand] = args;
 
   if (!command || command === "help" || command === "--help" || command === "-h") {
-    console.log("Usage: isds <version|doctor|schema status|inbox list|tui>");
+    console.log("Usage: isds <version|doctor|schema status|inbox list|sent list|tui>");
     return 0;
   }
 
@@ -44,6 +44,45 @@ export async function runCli(args: readonly string[] = Bun.argv.slice(2)): Promi
     });
     try {
       const result = await client.messages.listReceived({ limit, offset: 1 });
+      const safe = {
+        statusCode: result.statusCode,
+        statusMessage: result.statusMessage,
+        count: result.records.length,
+        records: result.records.map((record) => ({
+          ordinal: record.ordinal,
+          id: record.id,
+          messageStatus: record.messageStatus,
+          deliveryTime: record.deliveryTime,
+          acceptanceTime: record.acceptanceTime,
+          senderType: record.senderType,
+          vodz: record.vodz,
+          suspiciousFlag: record.suspiciousFlag,
+        })),
+      };
+      console.log(JSON.stringify(safe, null, 2));
+      return 0;
+    } finally {
+      await client.close();
+    }
+  }
+
+  if (command === "sent" && subcommand === "list") {
+    const environment = args.includes("--production") ? "production" : "public-test";
+    const limitIndex = args.indexOf("--limit");
+    const limit = limitIndex >= 0 ? Number(args[limitIndex + 1] ?? 10) : 10;
+    const username = Bun.env.ISDS_USERNAME;
+    const password = Bun.env.ISDS_PASSWORD;
+    if (!username || !password) {
+      console.error("Set ISDS_USERNAME and ISDS_PASSWORD for sent list.");
+      return 2;
+    }
+    const client = createIsdsClient({
+      environment,
+      authentication: { type: "password", username, password },
+      timeoutMs: 30000,
+    });
+    try {
+      const result = await client.messages.listSent({ limit, offset: 1 });
       const safe = {
         statusCode: result.statusCode,
         statusMessage: result.statusMessage,

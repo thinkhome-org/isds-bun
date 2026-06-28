@@ -1,0 +1,16 @@
+{
+  "operations": {
+    "GetListOfReceivedMessages": {
+      "module": "messages",
+      "method": "listReceived",
+      "fixture": true,
+      "test": true
+    },
+    "GetListOfSentMessages": {
+      "module": "messages",
+      "method": "listSent",
+      "fixture": true,
+      "test": true
+    }
+  }
+}

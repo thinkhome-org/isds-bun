@@ -15,6 +15,16 @@ export interface ListReceivedMessagesOptions {
   readonly signal?: AbortSignal;
 }
 
+export interface ListSentMessagesOptions {
+  readonly fromTime?: Date;
+  readonly toTime?: Date;
+  readonly senderOrgUnitNumber?: number | null;
+  readonly statusFilter?: string;
+  readonly offset?: number | null;
+  readonly limit?: number | null;
+  readonly signal?: AbortSignal;
+}
+
 export interface ReceivedMessageRecord {
   readonly ordinal?: number;
   readonly id?: string;
@@ -32,10 +42,19 @@ export interface ReceivedMessageRecord {
   readonly suspiciousFlag?: number;
 }
 
+export type SentMessageRecord = ReceivedMessageRecord;
+
 export interface ListReceivedMessagesResult {
   readonly statusCode: string;
   readonly statusMessage: string;
   readonly records: readonly ReceivedMessageRecord[];
+  readonly rawXml: string;
+}
+
+export interface ListSentMessagesResult {
+  readonly statusCode: string;
+  readonly statusMessage: string;
+  readonly records: readonly SentMessageRecord[];
   readonly rawXml: string;
 }
 
@@ -125,6 +144,37 @@ export class MessagesClient {
 
     const rawXml = await this.raw.invokeGeneratedXml(
       "GetListOfReceivedMessages",
+      bodyXml,
+      options.signal ? { signal: options.signal } : {},
+    );
+
+    const statusCode = firstText(rawXml, "dmStatusCode") ?? "";
+    const statusMessage = firstText(rawXml, "dmStatusMessage") ?? "";
+    if (statusCode !== "0000") {
+      throw new IsdsStatusError("ISDS returned an application status error.", { statusCode, statusMessage });
+    }
+
+    return {
+      statusCode,
+      statusMessage,
+      records: parseRecords(rawXml),
+      rawXml,
+    };
+  }
+
+  async listSent(options: ListSentMessagesOptions = {}): Promise<ListSentMessagesResult> {
+    await this.ensureInitialized();
+    const bodyXml = `<GetListOfSentMessages xmlns="http://isds.czechpoint.cz/v20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">` +
+      valueElement("dmFromTime", options.fromTime) +
+      valueElement("dmToTime", options.toTime) +
+      valueElement("dmSenderOrgUnitNum", options.senderOrgUnitNumber) +
+      `<dmStatusFilter>${escapeXmlText(options.statusFilter ?? "")}</dmStatusFilter>` +
+      valueElement("dmOffset", options.offset ?? 1) +
+      valueElement("dmLimit", options.limit ?? 10) +
+      `</GetListOfSentMessages>`;
+
+    const rawXml = await this.raw.invokeGeneratedXml(
+      "GetListOfSentMessages",
       bodyXml,
       options.signal ? { signal: options.signal } : {},
     );

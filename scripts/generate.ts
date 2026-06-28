@@ -28,6 +28,9 @@ const operations: Operation[] = [];
 const bundle = await Bun.file("schemas/manifests/production-bundle.json").exists()
   ? await Bun.file("schemas/manifests/production-bundle.json").json()
   : undefined;
+const wrappers = await Bun.file("schemas/manifests/high-level-wrappers.json").exists()
+  ? await Bun.file("schemas/manifests/high-level-wrappers.json").json()
+  : { operations: {} };
 
 function attr(text: string, name: string): string | undefined {
   return new RegExp(`${name}="([^"]*)"`).exec(text)?.[1];
@@ -68,6 +71,7 @@ for (const file of wsdlFiles) {
     const body = match[2] ?? "";
     const requestMessage = attr(/<input\b[^>]*>/.exec(body)?.[0] ?? "", "message")?.replace(/^tns:/, "");
     const responseMessage = attr(/<output\b[^>]*>/.exec(body)?.[0] ?? "", "message")?.replace(/^tns:/, "");
+    const wrapper = wrappers.operations[operation];
     operations.push({
       operation,
       service,
@@ -82,9 +86,9 @@ for (const file of wsdlFiles) {
       ...(responseMessage ? { responseMessage } : {}),
       sourceWsdl: file,
       sourceWsdlSha256: digest,
-      highLevelWrapper: operation === "GetListOfReceivedMessages",
-      fixture: operation === "GetListOfReceivedMessages",
-      test: operation === "GetListOfReceivedMessages",
+      highLevelWrapper: Boolean(wrapper),
+      fixture: Boolean(wrapper?.fixture),
+      test: Boolean(wrapper?.test),
     });
   }
 }

@@ -6,10 +6,10 @@ Status: generated from official production WSDL/XSD artifacts.
 |---|---:|
 | WSDL operations discovered | 45 |
 | Raw methods generated | 45 |
-| High-level wrappers complete | 1 |
-| Contract fixtures | 1 |
+| High-level wrappers complete | 2 |
+| Contract fixtures | 2 |
 | Raw operation coverage | 100% |
-| High-level coverage | 2% |
+| High-level coverage | 4% |
 
 | Service | Operation | Endpoint | Raw | High-level | Fixture | Test |
 |---|---|---|---:|---:|---:|---:|
@@ -38,7 +38,7 @@ Status: generated from official production WSDL/XSD artifacts.
 | dmInfoWebService | `MarkMessageAsDownloaded` | messages | yes | no | no | no |
 | dmInfoWebService | `GetDeliveryInfo` | messages | yes | no | no | no |
 | dmInfoWebService | `GetSignedDeliveryInfo` | messages | yes | no | no | no |
-| dmInfoWebService | `GetListOfSentMessages` | messages | yes | no | no | no |
+| dmInfoWebService | `GetListOfSentMessages` | messages | yes | yes | yes | yes |
 | dmInfoWebService | `GetListOfReceivedMessages` | messages | yes | yes | yes | yes |
 | dmInfoWebService | `GetMessageStateChanges` | messages | yes | no | no | no |
 | dmInfoWebService | `GetMessageAuthor` | messages | yes | no | no | no |
