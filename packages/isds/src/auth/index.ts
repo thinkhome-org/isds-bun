@@ -91,10 +91,25 @@ export class PasswordAuthAdapter implements IsdsAuthenticationAdapter {
 
   async capabilities(): Promise<IsdsCapabilityPatch> {
     return {
-      interfaces: { passwordUser: true },
-      messages: { listReceived: true, listSent: true, read: true },
+      interfaces: {
+        passwordUser: true,
+        standardMessages: true,
+        dataBoxSearch: true,
+        dataBoxAccess: true,
+      },
+      messages: {
+        listReceived: true,
+        listSent: true,
+        read: true,
+        readAll: true,
+        send: true,
+        sendPDZ: true,
+        erase: true,
+      },
       dataBoxes: { search: true, inspect: true },
-      crypto: { serverAuthenticate: true },
+      users: { update: true },
+      notifications: { register: true, consume: true },
+      crypto: { serverAuthenticate: true, serverRetimestamp: true },
     };
   }
 
