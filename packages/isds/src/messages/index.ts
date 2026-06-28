@@ -67,6 +67,28 @@ export interface MessageEnvelopeDownloadResult {
 
 export type SentMessageEnvelopeDownloadResult = MessageEnvelopeDownloadResult;
 
+export interface DownloadedMessageFile {
+  readonly description?: string;
+  readonly mimeType?: string;
+  readonly metaType?: string;
+  readonly fileGuid?: string;
+  readonly upFileGuid?: string;
+  readonly encodedContent?: string;
+  readonly xmlContent?: string;
+}
+
+export interface MessageDownloadResult {
+  readonly statusCode: string;
+  readonly statusMessage: string;
+  readonly message?: {
+    readonly envelope?: ReceivedMessageRecord;
+    readonly files: readonly DownloadedMessageFile[];
+    readonly hash?: MessageHash;
+    readonly timestamp?: string;
+  };
+  readonly rawXml: string;
+}
+
 export interface StatusOnlyResult {
   readonly statusCode: string;
   readonly statusMessage: string;
@@ -91,6 +113,21 @@ export interface VerifyMessageResult {
   readonly statusCode: string;
   readonly statusMessage: string;
   readonly hash?: MessageHash;
+  readonly rawXml: string;
+}
+
+export interface AuthenticateMessageResult {
+  readonly statusCode: string;
+  readonly statusMessage: string;
+  readonly authenticated?: boolean;
+  readonly rawXml: string;
+}
+
+export interface ReSignISDSDocumentResult {
+  readonly statusCode: string;
+  readonly statusMessage: string;
+  readonly document?: string;
+  readonly validTo?: string;
   readonly rawXml: string;
 }
 
@@ -120,6 +157,8 @@ export interface SignedDeliveryInfoResult {
   readonly signature?: string;
   readonly rawXml: string;
 }
+
+export type SignedMessageDownloadResult = SignedDeliveryInfoResult;
 
 export interface MessageStateChange {
   readonly id: string;
@@ -347,6 +386,30 @@ function parseHash(xml: string): MessageHash | undefined {
   };
 }
 
+function parseMessageFiles(xml: string | undefined): DownloadedMessageFile[] {
+  if (!xml) return [];
+  const files: DownloadedMessageFile[] = [];
+  for (const match of xml.matchAll(/<((?:[\w.-]+:)?dmFile)([^>]*)>([\s\S]*?)<\/\1>/g)) {
+    const attrs = match[2] ?? "";
+    const body = match[3] ?? "";
+    const file: Record<string, unknown> = {};
+    const fields = {
+      description: attr(attrs, "dmFileDescr"),
+      mimeType: attr(attrs, "dmMimeType"),
+      metaType: attr(attrs, "dmFileMetaType"),
+      fileGuid: attr(attrs, "dmFileGuid"),
+      upFileGuid: attr(attrs, "dmUpFileGuid"),
+      encodedContent: firstText(body, "dmEncodedContent"),
+      xmlContent: elementBody(body, "dmXMLContent"),
+    };
+    for (const [key, value] of Object.entries(fields)) {
+      if (value !== undefined) file[key] = value;
+    }
+    files.push(file as DownloadedMessageFile);
+  }
+  return files;
+}
+
 function parseNotificationRecords(xml: string): NotificationRecord[] {
   const records: NotificationRecord[] = [];
   for (const match of xml.matchAll(/<((?:[\w.-]+:)?ntfRecord)(?:\s[^>]*)?>([\s\S]*?)<\/\1>/g)) {
@@ -453,6 +516,33 @@ export class MessagesClient {
     return this.downloadEnvelopeByOperation("SentMessageEnvelopeDownload", messageId, options);
   }
 
+  async downloadMessage(messageId: string, options: { signal?: AbortSignal } = {}): Promise<MessageDownloadResult> {
+    await this.ensureInitialized();
+    const rawXml = await this.raw.invokeGeneratedXml(
+      "MessageDownload",
+      idRequest("MessageDownload", messageId),
+      options.signal ? { signal: options.signal } : {},
+    );
+    const { statusCode, statusMessage } = assertOk(rawXml);
+    const returned = elementBody(rawXml, "dmReturnedMessage");
+    if (!returned) return { statusCode, statusMessage, rawXml };
+    const dmDm = elementBody(returned, "dmDm");
+    const files = parseMessageFiles(dmDm ? elementBody(dmDm, "dmFiles") : undefined);
+    const hash = parseHash(returned);
+    const timestamp = firstText(returned, "dmQTimestamp");
+    return {
+      statusCode,
+      statusMessage,
+      message: {
+        ...(dmDm ? { envelope: parseEnvelope(dmDm) } : {}),
+        files,
+        ...(hash ? { hash } : {}),
+        ...(timestamp ? { timestamp } : {}),
+      },
+      rawXml,
+    };
+  }
+
   private async downloadEnvelopeByOperation(operation: "MessageEnvelopeDownload" | "SentMessageEnvelopeDownload", messageId: string, options: { signal?: AbortSignal }): Promise<MessageEnvelopeDownloadResult> {
     await this.ensureInitialized();
     const rawXml = await this.raw.invokeGeneratedXml(
@@ -540,6 +630,31 @@ export class MessagesClient {
     const rawXml = await this.raw.invokeGeneratedXml(
       "GetSignedDeliveryInfo",
       idRequest("GetSignedDeliveryInfo", messageId),
+      options.signal ? { signal: options.signal } : {},
+    );
+    const { statusCode, statusMessage } = assertOk(rawXml);
+    const signature = firstText(rawXml, "dmSignature");
+    return {
+      statusCode,
+      statusMessage,
+      ...(signature ? { signature } : {}),
+      rawXml,
+    };
+  }
+
+  async downloadSignedMessage(messageId: string, options: { signal?: AbortSignal } = {}): Promise<SignedMessageDownloadResult> {
+    return this.downloadSignedMessageByOperation("SignedMessageDownload", messageId, options);
+  }
+
+  async downloadSignedSentMessage(messageId: string, options: { signal?: AbortSignal } = {}): Promise<SignedMessageDownloadResult> {
+    return this.downloadSignedMessageByOperation("SignedSentMessageDownload", messageId, options);
+  }
+
+  private async downloadSignedMessageByOperation(operation: "SignedMessageDownload" | "SignedSentMessageDownload", messageId: string, options: { signal?: AbortSignal }): Promise<SignedMessageDownloadResult> {
+    await this.ensureInitialized();
+    const rawXml = await this.raw.invokeGeneratedXml(
+      operation,
+      idRequest(operation, messageId),
       options.signal ? { signal: options.signal } : {},
     );
     const { statusCode, statusMessage } = assertOk(rawXml);
@@ -724,6 +839,65 @@ export class MessagesClient {
     const rawXml = await this.raw.invokeGeneratedXml(
       "SuspMessageReport",
       bodyXml,
+      options.signal ? { signal: options.signal } : {},
+    );
+    const { statusCode, statusMessage } = assertOk(rawXml);
+    return { statusCode, statusMessage, rawXml };
+  }
+
+  async authenticateMessage(signedMessage: string, options: { signal?: AbortSignal } = {}): Promise<AuthenticateMessageResult> {
+    if (!signedMessage) {
+      throw new IsdsConfigurationError("AuthenticateMessage requires a signed message payload.");
+    }
+    await this.ensureInitialized();
+    const bodyXml = `<AuthenticateMessage xmlns="http://isds.czechpoint.cz/v20">` +
+      `<dmMessage>${escapeXmlText(signedMessage)}</dmMessage>` +
+      `</AuthenticateMessage>`;
+    const rawXml = await this.raw.invokeGeneratedXml(
+      "AuthenticateMessage",
+      bodyXml,
+      options.signal ? { signal: options.signal } : {},
+    );
+    const { statusCode, statusMessage } = assertOk(rawXml);
+    const authenticated = booleanFrom(rawXml, "dmAuthResult");
+    return {
+      statusCode,
+      statusMessage,
+      ...(authenticated !== undefined ? { authenticated } : {}),
+      rawXml,
+    };
+  }
+
+  async reSignISDSDocument(document: string, options: { signal?: AbortSignal } = {}): Promise<ReSignISDSDocumentResult> {
+    if (!document) {
+      throw new IsdsConfigurationError("Re-signISDSDocument requires a document payload.");
+    }
+    await this.ensureInitialized();
+    const bodyXml = `<Re-signISDSDocument xmlns="http://isds.czechpoint.cz/v20">` +
+      `<dmDoc>${escapeXmlText(document)}</dmDoc>` +
+      `</Re-signISDSDocument>`;
+    const rawXml = await this.raw.invokeGeneratedXml(
+      "Re-signISDSDocument",
+      bodyXml,
+      options.signal ? { signal: options.signal } : {},
+    );
+    const { statusCode, statusMessage } = assertOk(rawXml);
+    const resultDoc = firstText(rawXml, "dmResultDoc");
+    const validTo = firstText(rawXml, "dmValidTo");
+    return {
+      statusCode,
+      statusMessage,
+      ...(resultDoc ? { document: resultDoc } : {}),
+      ...(validTo ? { validTo } : {}),
+      rawXml,
+    };
+  }
+
+  async dummyOperation(value = "", options: { signal?: AbortSignal } = {}): Promise<StatusOnlyResult> {
+    await this.ensureInitialized();
+    const rawXml = await this.raw.invokeGeneratedXml(
+      "DummyOperation",
+      `<DummyOperation xmlns="http://isds.czechpoint.cz/v20">${escapeXmlText(value)}</DummyOperation>`,
       options.signal ? { signal: options.signal } : {},
     );
     const { statusCode, statusMessage } = assertOk(rawXml);

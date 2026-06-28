@@ -315,3 +315,99 @@ test("high-level suspicious message report calls raw SOAP operation", async () =
   });
   expect(result.statusCode).toBe("0000");
 });
+
+test("high-level message download returns envelope and files", async () => {
+  server = startMockIsdsServer({ username: "u", password: "p" });
+  const client = createIsdsClient({
+    environment: {
+      type: "custom",
+      name: "mock",
+      allowInsecureHttp: true,
+      endpoints: { messages: server.url.toString() },
+    },
+    authentication: { type: "password", username: "u", password: "p" },
+  });
+
+  const result = await client.messages.downloadMessage("123456");
+  expect(result.statusCode).toBe("0000");
+  expect(result.message?.envelope?.annotation).toBe("Downloaded Test");
+  expect(result.message?.files[0]).toEqual({
+    description: "hello.txt",
+    mimeType: "text/plain",
+    metaType: "main",
+    fileGuid: "file-1",
+    encodedContent: "SGVsbG8=",
+  });
+  expect(result.message?.hash).toEqual({ value: "SEFTSA==", algorithm: "SHA-256" });
+});
+
+test("high-level signed message downloads return signed payloads", async () => {
+  server = startMockIsdsServer({ username: "u", password: "p" });
+  const client = createIsdsClient({
+    environment: {
+      type: "custom",
+      name: "mock",
+      allowInsecureHttp: true,
+      endpoints: { messages: server.url.toString() },
+    },
+    authentication: { type: "password", username: "u", password: "p" },
+  });
+
+  const received = await client.messages.downloadSignedMessage("123456");
+  const sent = await client.messages.downloadSignedSentMessage("654321");
+  expect(received.statusCode).toBe("0000");
+  expect(received.signature).toBe("U0lHTkVEX1JFQ0VJVkVE");
+  expect(sent.statusCode).toBe("0000");
+  expect(sent.signature).toBe("U0lHTkVEX1NFTlQ=");
+});
+
+test("high-level authenticate message calls raw SOAP operation", async () => {
+  server = startMockIsdsServer({ username: "u", password: "p" });
+  const client = createIsdsClient({
+    environment: {
+      type: "custom",
+      name: "mock",
+      allowInsecureHttp: true,
+      endpoints: { messages: server.url.toString() },
+    },
+    authentication: { type: "password", username: "u", password: "p" },
+  });
+
+  const result = await client.messages.authenticateMessage("U0lHTkVE");
+  expect(result.statusCode).toBe("0000");
+  expect(result.authenticated).toBe(true);
+});
+
+test("high-level re-sign document calls raw SOAP operation", async () => {
+  server = startMockIsdsServer({ username: "u", password: "p" });
+  const client = createIsdsClient({
+    environment: {
+      type: "custom",
+      name: "mock",
+      allowInsecureHttp: true,
+      endpoints: { messages: server.url.toString() },
+    },
+    authentication: { type: "password", username: "u", password: "p" },
+  });
+
+  const result = await client.messages.reSignISDSDocument("RE9D");
+  expect(result.statusCode).toBe("0000");
+  expect(result.document).toBe("UkVTSUdORUQ=");
+  expect(result.validTo).toBe("2027-06-28");
+});
+
+test("high-level dummy operation calls raw SOAP operation", async () => {
+  server = startMockIsdsServer({ username: "u", password: "p" });
+  const client = createIsdsClient({
+    environment: {
+      type: "custom",
+      name: "mock",
+      allowInsecureHttp: true,
+      endpoints: { messages: server.url.toString() },
+    },
+    authentication: { type: "password", username: "u", password: "p" },
+  });
+
+  const result = await client.messages.dummyOperation();
+  expect(result.statusCode).toBe("0000");
+});

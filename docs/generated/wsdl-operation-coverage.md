@@ -6,10 +6,10 @@ Status: generated from official production WSDL/XSD artifacts.
 |---|---:|
 | WSDL operations discovered | 45 |
 | Raw methods generated | 45 |
-| High-level wrappers complete | 17 |
-| Contract fixtures | 17 |
+| High-level wrappers complete | 23 |
+| Contract fixtures | 23 |
 | Raw operation coverage | 100% |
-| High-level coverage | 38% |
+| High-level coverage | 51% |
 
 | Service | Operation | Endpoint | Raw | High-level | Fixture | Test |
 |---|---|---|---:|---:|---:|---:|
@@ -51,10 +51,10 @@ Status: generated from official production WSDL/XSD artifacts.
 | dmInfoWebService | `SentMessageEnvelopeDownload` | messages | yes | yes | yes | yes |
 | dmInfoWebService | `SuspMessageReport` | messages | yes | yes | yes | yes |
 | dmOperationsWebService | `CreateMessage` | messages | yes | no | no | no |
-| dmOperationsWebService | `MessageDownload` | messages | yes | no | no | no |
-| dmOperationsWebService | `SignedMessageDownload` | messages | yes | no | no | no |
-| dmOperationsWebService | `SignedSentMessageDownload` | messages | yes | no | no | no |
-| dmOperationsWebService | `DummyOperation` | messages | yes | no | no | no |
+| dmOperationsWebService | `MessageDownload` | messages | yes | yes | yes | yes |
+| dmOperationsWebService | `SignedMessageDownload` | messages | yes | yes | yes | yes |
+| dmOperationsWebService | `SignedSentMessageDownload` | messages | yes | yes | yes | yes |
+| dmOperationsWebService | `DummyOperation` | messages | yes | yes | yes | yes |
 | dmOperationsWebService | `CreateMultipleMessage` | messages | yes | no | no | no |
-| dmOperationsWebService | `AuthenticateMessage` | messages | yes | no | no | no |
-| dmOperationsWebService | `Re-signISDSDocument` | messages | yes | no | no | no |
+| dmOperationsWebService | `AuthenticateMessage` | messages | yes | yes | yes | yes |
+| dmOperationsWebService | `Re-signISDSDocument` | messages | yes | yes | yes | yes |

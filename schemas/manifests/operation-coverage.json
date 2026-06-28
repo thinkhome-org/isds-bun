@@ -3,11 +3,11 @@
   "source": "official-datovka-v20",
   "operationsDiscovered": 45,
   "rawMethodsGenerated": 45,
-  "highLevelWrappersComplete": 17,
-  "contractFixtures": 17,
+  "highLevelWrappersComplete": 23,
+  "contractFixtures": 23,
   "coveragePercent": 100,
   "rawCoveragePercent": 100,
-  "highLevelCoveragePercent": 38,
+  "highLevelCoveragePercent": 51,
   "operations": [
     {
       "operation": "GetOwnerInfoFromLogin",
@@ -707,9 +707,9 @@
       "responseMessage": "MessageDownloadResponse",
       "sourceWsdl": "dm_operations.wsdl",
       "sourceWsdlSha256": "80c3ed286c5c2775be8db64813c41ec54509b94d3839132192b03a65589bf905",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "SignedMessageDownload",
@@ -725,9 +725,9 @@
       "responseMessage": "SignedMessageDownloadResponse",
       "sourceWsdl": "dm_operations.wsdl",
       "sourceWsdlSha256": "80c3ed286c5c2775be8db64813c41ec54509b94d3839132192b03a65589bf905",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "SignedSentMessageDownload",
@@ -743,9 +743,9 @@
       "responseMessage": "SignedSentMessageDownloadResponse",
       "sourceWsdl": "dm_operations.wsdl",
       "sourceWsdlSha256": "80c3ed286c5c2775be8db64813c41ec54509b94d3839132192b03a65589bf905",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "DummyOperation",
@@ -761,9 +761,9 @@
       "responseMessage": "DummyOperationResponse",
       "sourceWsdl": "dm_operations.wsdl",
       "sourceWsdlSha256": "80c3ed286c5c2775be8db64813c41ec54509b94d3839132192b03a65589bf905",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "CreateMultipleMessage",
@@ -797,9 +797,9 @@
       "responseMessage": "AuthenticateMessageResponse",
       "sourceWsdl": "dm_operations.wsdl",
       "sourceWsdlSha256": "80c3ed286c5c2775be8db64813c41ec54509b94d3839132192b03a65589bf905",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "Re-signISDSDocument",
@@ -815,9 +815,9 @@
       "responseMessage": "Re-signISDSDocumentResponse",
       "sourceWsdl": "dm_operations.wsdl",
       "sourceWsdlSha256": "80c3ed286c5c2775be8db64813c41ec54509b94d3839132192b03a65589bf905",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     }
   ]
 }

@@ -101,6 +101,42 @@
       "method": "reportSuspiciousMessage",
       "fixture": true,
       "test": true
+    },
+    "MessageDownload": {
+      "module": "messages",
+      "method": "downloadMessage",
+      "fixture": true,
+      "test": true
+    },
+    "SignedMessageDownload": {
+      "module": "messages",
+      "method": "downloadSignedMessage",
+      "fixture": true,
+      "test": true
+    },
+    "SignedSentMessageDownload": {
+      "module": "messages",
+      "method": "downloadSignedSentMessage",
+      "fixture": true,
+      "test": true
+    },
+    "DummyOperation": {
+      "module": "messages",
+      "method": "dummyOperation",
+      "fixture": true,
+      "test": true
+    },
+    "AuthenticateMessage": {
+      "module": "messages",
+      "method": "authenticateMessage",
+      "fixture": true,
+      "test": true
+    },
+    "Re-signISDSDocument": {
+      "module": "messages",
+      "method": "reSignISDSDocument",
+      "fixture": true,
+      "test": true
     }
   }
 }

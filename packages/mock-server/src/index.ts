@@ -31,6 +31,42 @@ export function startMockIsdsServer(options: MockIsdsServerOptions = {}): Return
           { headers: { "Content-Type": "text/xml" } },
         );
       }
+      if (body.includes("SignedSentMessageDownload")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><SignedSentMessageDownloadResponse xmlns="http://isds.czechpoint.cz/v20"><dmSignature>U0lHTkVEX1NFTlQ=</dmSignature><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></SignedSentMessageDownloadResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("SignedMessageDownload")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><SignedMessageDownloadResponse xmlns="http://isds.czechpoint.cz/v20"><dmSignature>U0lHTkVEX1JFQ0VJVkVE</dmSignature><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></SignedMessageDownloadResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("MessageDownload")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><MessageDownloadResponse xmlns="http://isds.czechpoint.cz/v20"><dmReturnedMessage><dmDm><dmID>123456</dmID><dbIDSender>abc123</dbIDSender><dmSender>Sender</dmSender><dmSenderAddress>Address</dmSenderAddress><dmSenderType>10</dmSenderType><dmRecipient>Recipient</dmRecipient><dmRecipientAddress>Recipient Address</dmRecipientAddress><dmAnnotation>Downloaded Test</dmAnnotation><dmFiles><dmFile dmMimeType="text/plain" dmFileMetaType="main" dmFileDescr="hello.txt" dmFileGuid="file-1"><dmEncodedContent>SGVsbG8=</dmEncodedContent></dmFile></dmFiles></dmDm><dmHash algorithm="SHA-256">SEFTSA==</dmHash><dmQTimestamp>VElNRVNUQU1Q</dmQTimestamp></dmReturnedMessage><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></MessageDownloadResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("AuthenticateMessage")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><AuthenticateMessageResponse xmlns="http://isds.czechpoint.cz/v20"><dmAuthResult>true</dmAuthResult><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></AuthenticateMessageResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("Re-signISDSDocument")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><Re-signISDSDocumentResponse xmlns="http://isds.czechpoint.cz/v20"><dmResultDoc>UkVTSUdORUQ=</dmResultDoc><dmValidTo>2027-06-28</dmValidTo><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></Re-signISDSDocumentResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("DummyOperation")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><DummyOperationResponse xmlns="http://isds.czechpoint.cz/v20"><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></DummyOperationResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
       if (body.includes("GetListOfReceivedMessages")) {
         return new Response(
           `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><GetListOfReceivedMessagesResponse xmlns="http://isds.czechpoint.cz/v20"><dmRecords><dmRecord dmType="V" dmVODZ="false"><dmOrdinal>1</dmOrdinal><dmID>123456</dmID><dbIDSender>abc123</dbIDSender><dmSender>Sender</dmSender><dmSenderAddress>Address</dmSenderAddress><dmSenderType>10</dmSenderType><dmRecipient>Recipient</dmRecipient><dmRecipientAddress>Recipient Address</dmRecipientAddress><dmAnnotation>Test</dmAnnotation><dmMessageStatus>4</dmMessageStatus><dmAttachmentSize>1</dmAttachmentSize><dmDeliveryTime>2026-06-28T00:00:00Z</dmDeliveryTime><dmAcceptanceTime>2026-06-28T00:00:00Z</dmAcceptanceTime></dmRecord></dmRecords><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></GetListOfReceivedMessagesResponse></soap:Body></soap:Envelope>`,
