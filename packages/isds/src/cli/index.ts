@@ -3,12 +3,51 @@
 
 import coverage from "../../../../schemas/manifests/operation-coverage.json" with { type: "json" };
 import { createIsdsClient } from "../client/index.ts";
+import type { IsdsAuthentication } from "../auth/index.ts";
+import { IsdsConfigurationError } from "../errors/index.ts";
+import { loadIsdsConfig, resolveProfile } from "../config/profiles.ts";
+import type { IsdsEnvironment } from "../config/environment.ts";
+
+function flagValue(args: readonly string[], name: string): string | undefined {
+  const index = args.indexOf(name);
+  return index >= 0 ? args[index + 1] : undefined;
+}
+
+function flag(args: readonly string[], name: string): boolean {
+  return args.includes(name);
+}
+
+function cliEnvironment(args: readonly string[]): IsdsEnvironment | undefined {
+  const value = flagValue(args, "--environment");
+  if (value === "production" || value === "public-test") return value;
+  if (flag(args, "--production")) return "production";
+  return undefined;
+}
+
+async function resolveCliProfile(args: readonly string[]) {
+  const configPath = flagValue(args, "--config");
+  const profileName = flagValue(args, "--profile");
+  const environment = cliEnvironment(args);
+  const config = await loadIsdsConfig({ ...(configPath ? { configPath } : {}) });
+  return resolveProfile(config, {
+    ...(profileName ? { profileName } : {}),
+    ...(environment ? { environment } : {}),
+    cwd: process.cwd(),
+    env: Bun.env,
+  });
+}
+
+function requiresAuthentication(authentication: IsdsAuthentication, command: string): boolean {
+  if (authentication.type !== "none") return true;
+  console.error(`Set ISDS_USERNAME and ISDS_PASSWORD, or configure a password profile, for ${command}.`);
+  return false;
+}
 
 export async function runCli(args: readonly string[] = Bun.argv.slice(2)): Promise<number> {
   const [command, subcommand] = args;
 
   if (!command || command === "help" || command === "--help" || command === "-h") {
-    console.log("Usage: isds <version|doctor|schema status|inbox list|sent list|tui>");
+    console.log("Usage: isds <version|doctor|schema status|profile list|profile show|inbox list|sent list|tui> [--profile name] [--environment production|public-test] [--config path]");
     return 0;
   }
 
@@ -27,20 +66,52 @@ export async function runCli(args: readonly string[] = Bun.argv.slice(2)): Promi
     return 0;
   }
 
+  if (command === "profile" && subcommand === "list") {
+    const configPath = flagValue(args, "--config");
+    const config = await loadIsdsConfig({ ...(configPath ? { configPath } : {}) });
+    console.log(JSON.stringify({ profiles: Object.keys(config.profiles), defaultProfile: config.defaultProfile ?? null, sources: config.sources }, null, 2));
+    return 0;
+  }
+
+  if (command === "profile" && subcommand === "show") {
+    const name = flagValue(args, "--profile");
+    const configPath = flagValue(args, "--config");
+    const config = await loadIsdsConfig({ ...(configPath ? { configPath } : {}) });
+    const profileName = name ?? config.defaultProfile;
+    if (!profileName || !config.profiles[profileName]) {
+      console.error("Profile not found. Use --profile or configure defaultProfile.");
+      return 2;
+    }
+    const profile = config.profiles[profileName];
+    console.log(JSON.stringify({
+      name: profileName,
+      environment: profile.environment ?? null,
+      authentication: profile.authentication ?? null,
+      usernameSecret: profile.usernameSecret ?? null,
+      passwordSecret: profile.passwordSecret ? "[configured]" : null,
+      secretService: profile.secretService ?? null,
+    }, null, 2));
+    return 0;
+  }
+
   if (command === "inbox" && subcommand === "list") {
-    const environment = args.includes("--production") ? "production" : "public-test";
     const limitIndex = args.indexOf("--limit");
     const limit = limitIndex >= 0 ? Number(args[limitIndex + 1] ?? 10) : 10;
-    const username = Bun.env.ISDS_USERNAME;
-    const password = Bun.env.ISDS_PASSWORD;
-    if (!username || !password) {
-      console.error("Set ISDS_USERNAME and ISDS_PASSWORD for inbox list.");
+    let profile;
+    try {
+      profile = await resolveCliProfile(args);
+    } catch (error) {
+      console.error(error instanceof IsdsConfigurationError ? error.message : String(error));
+      return 2;
+    }
+    if (!requiresAuthentication(profile.authentication, "inbox list")) {
       return 2;
     }
     const client = createIsdsClient({
-      environment,
-      authentication: { type: "password", username, password },
+      environment: profile.environment,
+      authentication: profile.authentication,
       timeoutMs: 30000,
+      ...(profile.name ? { profileName: profile.name } : {}),
     });
     try {
       const result = await client.messages.listReceived({ limit, offset: 1 });
@@ -67,19 +138,23 @@ export async function runCli(args: readonly string[] = Bun.argv.slice(2)): Promi
   }
 
   if (command === "sent" && subcommand === "list") {
-    const environment = args.includes("--production") ? "production" : "public-test";
     const limitIndex = args.indexOf("--limit");
     const limit = limitIndex >= 0 ? Number(args[limitIndex + 1] ?? 10) : 10;
-    const username = Bun.env.ISDS_USERNAME;
-    const password = Bun.env.ISDS_PASSWORD;
-    if (!username || !password) {
-      console.error("Set ISDS_USERNAME and ISDS_PASSWORD for sent list.");
+    let profile;
+    try {
+      profile = await resolveCliProfile(args);
+    } catch (error) {
+      console.error(error instanceof IsdsConfigurationError ? error.message : String(error));
+      return 2;
+    }
+    if (!requiresAuthentication(profile.authentication, "sent list")) {
       return 2;
     }
     const client = createIsdsClient({
-      environment,
-      authentication: { type: "password", username, password },
+      environment: profile.environment,
+      authentication: profile.authentication,
       timeoutMs: 30000,
+      ...(profile.name ? { profileName: profile.name } : {}),
     });
     try {
       const result = await client.messages.listSent({ limit, offset: 1 });
