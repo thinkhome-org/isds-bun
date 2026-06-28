@@ -48,6 +48,51 @@ test("high-level sent list calls raw read-only SOAP operation", async () => {
   expect(result.records[0]?.id).toBe("654321");
 });
 
+test("high-level create message calls raw SOAP operation", async () => {
+  server = startMockIsdsServer({ username: "u", password: "p" });
+  const client = createIsdsClient({
+    environment: {
+      type: "custom",
+      name: "mock",
+      allowInsecureHttp: true,
+      endpoints: { messages: server.url.toString() },
+    },
+    authentication: { type: "password", username: "u", password: "p" },
+  });
+
+  const result = await client.messages.createMessage({
+    recipientBoxId: "abc123",
+    annotation: "Mock send",
+    files: [{ description: "hello.txt", mimeType: "text/plain", content: "Hello" }],
+  });
+  expect(result.statusCode).toBe("0000");
+  expect(result.id).toBe("created-1");
+});
+
+test("high-level create multiple messages returns per-recipient statuses", async () => {
+  server = startMockIsdsServer({ username: "u", password: "p" });
+  const client = createIsdsClient({
+    environment: {
+      type: "custom",
+      name: "mock",
+      allowInsecureHttp: true,
+      endpoints: { messages: server.url.toString() },
+    },
+    authentication: { type: "password", username: "u", password: "p" },
+  });
+
+  const result = await client.messages.createMultipleMessages({
+    recipients: [{ boxId: "abc123" }, { boxId: "def456", toHands: "Office" }],
+    annotation: "Mock batch send",
+    files: [{ description: "hello.txt", mimeType: "text/plain", encodedContent: "SGVsbG8=" }],
+  });
+  expect(result.statusCode).toBe("0000");
+  expect(result.statuses).toEqual([
+    { id: "multi-1", statusCode: "0000", statusMessage: "OK" },
+    { id: "multi-2", statusCode: "0000", statusMessage: "OK" },
+  ]);
+});
+
 test("high-level envelope download calls raw read-only SOAP operation", async () => {
   server = startMockIsdsServer({ username: "u", password: "p" });
   const client = createIsdsClient({

@@ -3,11 +3,11 @@
   "source": "official-datovka-v20",
   "operationsDiscovered": 45,
   "rawMethodsGenerated": 45,
-  "highLevelWrappersComplete": 43,
-  "contractFixtures": 43,
+  "highLevelWrappersComplete": 45,
+  "contractFixtures": 45,
   "coveragePercent": 100,
   "rawCoveragePercent": 100,
-  "highLevelCoveragePercent": 96,
+  "highLevelCoveragePercent": 100,
   "operations": [
     {
       "operation": "GetOwnerInfoFromLogin",
@@ -689,9 +689,9 @@
       "responseMessage": "MessageCreateResponse",
       "sourceWsdl": "dm_operations.wsdl",
       "sourceWsdlSha256": "80c3ed286c5c2775be8db64813c41ec54509b94d3839132192b03a65589bf905",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "MessageDownload",
@@ -779,9 +779,9 @@
       "responseMessage": "MultipleMessageCreateResponse",
       "sourceWsdl": "dm_operations.wsdl",
       "sourceWsdlSha256": "80c3ed286c5c2775be8db64813c41ec54509b94d3839132192b03a65589bf905",
-      "highLevelWrapper": false,
-      "fixture": false,
-      "test": false
+      "highLevelWrapper": true,
+      "fixture": true,
+      "test": true
     },
     {
       "operation": "AuthenticateMessage",

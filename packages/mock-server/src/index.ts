@@ -145,6 +145,18 @@ export function startMockIsdsServer(options: MockIsdsServerOptions = {}): Return
           { headers: { "Content-Type": "text/xml" } },
         );
       }
+      if (body.includes("CreateMultipleMessage")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><CreateMultipleMessageResponse xmlns="http://isds.czechpoint.cz/v20"><dmMultipleStatus><dmSingleStatus><dmID>multi-1</dmID><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></dmSingleStatus><dmSingleStatus><dmID>multi-2</dmID><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></dmSingleStatus></dmMultipleStatus><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></CreateMultipleMessageResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
+      if (body.includes("CreateMessage")) {
+        return new Response(
+          `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><CreateMessageResponse xmlns="http://isds.czechpoint.cz/v20"><dmID>created-1</dmID><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></CreateMessageResponse></soap:Body></soap:Envelope>`,
+          { headers: { "Content-Type": "text/xml" } },
+        );
+      }
       if (body.includes("VerifyMessage")) {
         return new Response(
           `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><VerifyMessageResponse xmlns="http://isds.czechpoint.cz/v20"><dmHash algorithm="SHA-256">SEFTSA==</dmHash><dmStatus><dmStatusCode>0000</dmStatusCode><dmStatusMessage>OK</dmStatusMessage></dmStatus></VerifyMessageResponse></soap:Body></soap:Envelope>`,

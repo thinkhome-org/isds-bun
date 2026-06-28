@@ -120,6 +120,18 @@
       "fixture": true,
       "test": true
     },
+    "CreateMessage": {
+      "module": "messages",
+      "method": "createMessage",
+      "fixture": true,
+      "test": true
+    },
+    "CreateMultipleMessage": {
+      "module": "messages",
+      "method": "createMultipleMessages",
+      "fixture": true,
+      "test": true
+    },
     "VerifyMessage": {
       "module": "messages",
       "method": "verifyMessage",
